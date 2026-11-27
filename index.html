@@ -29,6 +29,13 @@ input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);bo
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:4px 0}.g4 button{padding:4px 2px;font-size:12px}
 @media (max-width:760px){body{flex-direction:column}aside{width:auto;height:50%;border-left:0;border-top:1px solid var(--ln)}.mw{flex-direction:column}#mnav{width:auto;max-height:34%;border-right:0;border-bottom:1px solid var(--ln)}}
 
+/* ===== 아크릴판 배치 ===== */
+#lay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:55;padding:12px}#lay[hidden]{display:none}
+.mb.lb{width:min(1280px,100%);height:min(94vh,900px)}
+.lt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:7px 14px;border-bottom:1px solid var(--ln)}
+.lt label{margin:0;gap:6px}.lt input[type=number]{width:64px}.lt #shn{color:var(--tx);font-weight:600;min-width:150px}
+#lc{flex:1;min-height:0;position:relative;background:var(--bg)}#lcv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+#lst{padding:6px 14px;border-top:1px solid var(--ln);color:var(--mu);font-size:12px}#lst .bad{color:#e0476a;font-weight:600}
 /* ===== 옵션별 도움말(?) 버튼 + 팝업 ===== */
 .hb{display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;padding:0;margin:0;border-radius:50%;font-size:12px;font-weight:700;line-height:1;color:var(--ac);background:var(--bg);border:1px solid var(--ac);vertical-align:middle}
 .hb:hover,.hb.on{background:var(--ac);color:var(--pn)}
@@ -112,7 +119,10 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <h2>아크릴 칼선 (자동 생성)</h2>
 <label><span><input type="checkbox" id="acut" checked> 칼선 자동 생성</span></label>
 <label>기본 칼선 여유(mm)<input type="range" id="acm" min="0" max="10" step=".1" value="2"><b id="acv"></b></label>
-<small>그림 외곽에서 바깥쪽으로 이 간격(mm)만큼 띄워 칼선을 만들고, 그 사이는 흰 아크릴로 채웁니다. 파츠를 선택하면 「칼선 여유 (이 파츠)」에서 파츠별로 따로 정할 수 있습니다.</small>
+<small>그림 외곽에서 바깥쪽으로 이 간격(mm)만큼 띄워 칼선을 만들고, 그 사이는 투명 영역으로 둡니다(그림 없이 투명 아크릴). 파츠를 선택하면 「칼선 여유 (이 파츠)」에서 파츠별로 따로 정할 수 있습니다.</small>
+<h2>아크릴판 배치</h2>
+<button class="w" id="layo">🧩 아크릴판에 파츠 배치하기</button>
+<small>판 크기를 정하고 파츠를 실제 크기 그대로 놓습니다. 자동 배치는 파츠 간격 3mm 이상.</small>
 <h2>저장</h2>
 <button class="w" id="expp">선택 파츠 저장 (구멍·꽂는 부분 포함)</button>
 <button class="w" id="expa">전체 파츠 저장 (zip)</button>
@@ -144,7 +154,7 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <article data-g="선택한 파츠" data-t="크기 · 비율 고정"><p>가로/세로를 mm로 입력합니다. <b>비율 고정</b>이 켜져 있으면 한쪽을 바꿀 때 다른 쪽이 원본 비율로 따라옵니다. 아래의 「오브젝트 영역」은 스냅·겹침 검사가 쓰는 실제 그림 영역 크기입니다.</p></article>
 <article data-g="선택한 파츠" data-t="위치 · 회전 · X/Y/Z +90°"><p>위치(mm)와 회전(°)을 숫자로 직접 입력합니다. <b>X/Y/Z +90°</b> 버튼은 해당 축으로 90°씩 바로 돌립니다.</p></article>
 <article data-g="선택한 파츠" data-t="앞면 · 뒷면 흰 잉크"><p>파츠마다 앞면/뒷면을 따로 정합니다. <b>있음</b>은 흰색 계열도 꽉 차게, <b>없음</b>은 흰 부분이 투명하게 비치게 보여 줍니다. <b>재질 따름</b>은 재질 설정의 불투명도를 따릅니다.</p></article>
-<article data-g="선택한 파츠" data-t="칼선 여유 (파츠별, mm)"><p>선택한 파츠의 그림 외곽에서 바깥쪽으로 칼선을 얼마나 띄울지 mm로 정합니다. 그림과 칼선 사이는 흰 아크릴로 채워집니다.</p><ul><li><b>전체 설정 따름</b>: 「아크릴 칼선」의 기본값(처음 2mm)을 그대로 씁니다. 기본값을 바꾸면 이 파츠도 같이 바뀝니다.</li><li><b>직접 지정</b>: 슬라이더로 0.1~10mm 사이에서 이 파츠만 따로 정합니다.</li><li><b>없음</b>: 이 파츠는 칼선을 만들지 않고 그림 모양 그대로 둡니다.</li><li>꽂는 부분과 구멍은 칼선 바깥에서 붙고 뚫리므로 입력한 mm 크기 그대로 유지됩니다.</li><li>케이스 판(앞·뒤·좌·우·상·하)과 처음 견본의 내부파츠는 조립 치수가 어긋나지 않도록 「없음」으로 시작합니다. 새로 추가한 파츠는 「전체 설정 따름」으로 시작합니다.</li></ul></article>
+<article data-g="선택한 파츠" data-t="칼선 여유 (파츠별, mm)"><p>선택한 파츠의 그림 외곽에서 바깥쪽으로 칼선을 얼마나 띄울지 mm로 정합니다. 그림과 칼선 사이는 투명 영역으로 남습니다.</p><ul><li><b>전체 설정 따름</b>: 「아크릴 칼선」의 기본값(처음 2mm)을 그대로 씁니다. 기본값을 바꾸면 이 파츠도 같이 바뀝니다.</li><li><b>직접 지정</b>: 슬라이더로 0.1~10mm 사이에서 이 파츠만 따로 정합니다.</li><li><b>없음</b>: 이 파츠는 칼선을 만들지 않고 그림 모양 그대로 둡니다.</li><li>꽂는 부분과 구멍은 칼선 바깥에서 붙고 뚫리므로 입력한 mm 크기 그대로 유지됩니다.</li><li>케이스 판(앞·뒤·좌·우·상·하)과 처음 견본의 내부파츠는 조립 치수가 어긋나지 않도록 「없음」으로 시작합니다. 새로 추가한 파츠는 「전체 설정 따름」으로 시작합니다.</li></ul></article>
 <article data-g="선택한 파츠" data-t="복제 · 삭제"><ul><li><b>복제</b>: 이미지·구멍·꽂는 부분까지 그대로 복사해 옆에 놓습니다.</li><li><b>삭제</b>: 선택한 파츠를 지웁니다.</li></ul></article>
 <article data-g="스탠드 꽂는 부분" data-t="꽂는 부분 만들기"><p>스탠드로 쓸 파츠를 선택하고 체크하면 그림 영역의 끝에 탭이 붙습니다. 탭 두께는 아크릴 두께와 같습니다.</p></article>
 <article data-g="스탠드 꽂는 부분" data-t="폭 · 길이 · 꽂는 면 · 위치 미세조정"><ul><li><b>폭/길이</b>: 탭의 크기(mm)입니다.</li><li><b>꽂는 면</b>: 아래(바닥)·위·왼쪽·오른쪽 중 탭이 붙는 쪽입니다.</li><li><b>위치 미세조정</b>: 탭을 가운데에서 좌우(또는 상하)로 옮깁니다.</li></ul></article>
@@ -160,12 +170,32 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <article data-g="재질" data-t="종류"><p>투명 / 반투명(프로스트) / 불투명 화이트 / 스모크 중에서 고릅니다. 고르면 바탕 불투명도도 그에 맞게 바뀝니다.</p></article>
 <article data-g="재질" data-t="인쇄 외 바탕 불투명도 · 광택"><ul><li><b>바탕 불투명도</b>: 흰색에 가까운 부분이 얼마나 비칠지 정합니다.</li><li><b>광택</b>: 낮을수록 반짝입니다.</li></ul></article>
 <article data-g="재질" data-t="아크릴 두께"><p>1~10mm. 전체 판에 공통으로 적용되고 판 단면이 두께만큼 보입니다. 두께를 바꿔도 판 위치는 자동으로 다시 계산되지 않으니 직접 맞추거나 초기화하세요.</p></article>
-<article data-g="칼선" data-t="칼선 자동 생성 · 기본 여유(mm)"><p>그림의 외곽선에서 바깥쪽으로 일정 간격(mm)을 띄운 둥근 칼선을 자동으로 만듭니다. 칼선 안쪽 빈 곳은 흰 아크릴로 채워집니다.</p><ul><li><b>칼선 자동 생성</b>: 「전체 설정 따름」인 파츠에 칼선을 만들지 켜고 끕니다.</li><li><b>기본 칼선 여유(mm)</b>: 기본값은 2mm이고 0~10mm 사이에서 0.1mm 단위로 조절합니다.</li><li>파츠별로 다르게 하려면 파츠를 선택하고 「칼선 여유 (이 파츠)」를 바꾸세요.</li><li>칼선은 「보기」의 <b>칼선 표시</b>를 켜면 분홍색 선으로 보이고, 파츠 저장 PNG에도 같은 모양으로 반영됩니다.</li></ul></article>
+<article data-g="칼선" data-t="칼선 자동 생성 · 기본 여유(mm)"><p>그림의 외곽선에서 바깥쪽으로 일정 간격(mm)을 띄운 둥근 칼선을 자동으로 만듭니다. 칼선 안쪽 빈 곳은 투명 영역으로 남습니다(저장 PNG에서도 투명).</p><ul><li><b>칼선 자동 생성</b>: 「전체 설정 따름」인 파츠에 칼선을 만들지 켜고 끕니다.</li><li><b>기본 칼선 여유(mm)</b>: 기본값은 2mm이고 0~10mm 사이에서 0.1mm 단위로 조절합니다.</li><li>파츠별로 다르게 하려면 파츠를 선택하고 「칼선 여유 (이 파츠)」를 바꾸세요.</li><li>칼선은 「보기」의 <b>칼선 표시</b>를 켜면 분홍색 선으로 보이고, 파츠 저장 PNG에도 같은 모양으로 반영됩니다.</li></ul></article>
+<article data-g="배치" data-t="아크릴판 배치"><p>아크릴판 한 장 위에 모든 파츠를 <b>실제 크기 그대로</b> 놓아 보는 화면입니다. 확대·축소는 보기만 바뀔 뿐 파츠 크기는 변하지 않습니다.</p><ul><li><b>판 크기(mm)</b>: 가로×세로를 직접 입력하거나 목록에서 고릅니다. <b>가장자리 여백</b> 안쪽(점선)에만 놓는 것이 기준입니다.</li><li><b>자동 배치</b>: 파츠 사이를 <b>간격(최소 3mm)</b> 이상 띄워 빈틈없이 채워 놓습니다. 「90° 회전 허용」을 켜면 더 촘촘히 놓을 수 있습니다. 파츠는 사각형 영역(꽂는 부분 포함) 기준으로 배치됩니다. 판이 작아 못 들어간 파츠는 판 오른쪽 밖에 둡니다.</li><li><b>마음대로 옮기기</b>: 파츠를 끌어서 옮기고, 선택 후 X/Y(mm)를 입력하거나 방향키(Shift 5mm · Alt 0.1mm)로 미세 이동합니다. <b>R</b> 또는 「90° 회전」으로 돌립니다.</li><li><b>간격만큼 자석 붙이기</b>: 끄는 동안 다른 파츠·판 가장자리에 간격(3mm)을 두고 붙습니다(Alt를 누르면 일시 해제).</li><li>간격이 3mm보다 좁거나 겹치거나 여백 밖인 파츠는 붉은 테두리로 표시되고, 아래 안내줄에 개수가 나옵니다. 손으로 옮길 때는 막지 않고 경고만 합니다.</li><li>빈 곳을 끌면 화면 이동, 스크롤하면 확대·축소, <b>Ctrl+Z</b>로 배치를 되돌립니다.</li><li><b>배치 PNG 저장</b>: 판 크기 그대로(지정 DPI) 투명 배경 PNG로 저장합니다. 「칼선 표시」가 켜져 있으면 칼선도 그려집니다. 앞면 이미지 기준입니다.</li><li>배치는 프로젝트 저장·자동 저장에 함께 기록됩니다.</li></ul></article>
 <article data-g="저장" data-t="선택 파츠 저장 · 전체 파츠 저장"><ul><li><b>선택 파츠 저장</b>: 구멍·꽂는 부분이 반영된 판을 투명 배경 PNG로 저장합니다(뒷면이 있으면 앞·뒤 두 장을 zip으로).</li><li><b>전체 파츠 저장(zip)</b>: 모든 판을 zip 하나로 묶습니다.</li><li>칼선 표시가 켜져 있으면 칼선도 함께 그려집니다.</li></ul></article>
 <article data-g="저장" data-t="프로젝트 저장 · 불러오기"><p>모든 파츠(이미지 포함)·위치·회전·구멍·꽂는 부분·재질·배경색 등을 .json 파일 하나로 저장합니다. 외부 백업이므로 클라우드·USB 등에 보관하세요. <b>불러오기</b>로 그대로 복원됩니다.</p></article>
 <article data-g="저장" data-t="자동 저장"><p>켜져 있으면 작업이 바뀔 때마다 이 브라우저(IndexedDB)에 저장되고, 다시 열면 자동 복원됩니다. 브라우저 데이터를 지우거나 다른 기기·브라우저에서는 복원되지 않으니 중요한 작업은 .json으로도 저장하세요.</p></article>
 <article data-g="참고" data-t="알아두세요"><ul><li>이 화면은 미리보기용 근사치입니다. 최종 제작 전에는 실제 도면으로 다시 확인하세요.</li><li>저장할 때 확인창이 뜨며 허용해야 파일이 저장됩니다.</li><li>이 설명서는 처음 방문할 때 한 번 자동으로 열리고, 사이드 패널 맨 위 「사용 설명서」로 언제든 다시 열 수 있습니다.</li></ul></article>
 </div></div></div></div>
+<div id="lay" hidden><div class="mb lb"><div class="mh"><h1>아크릴판 배치</h1><button id="lxb">✕ 닫기</button></div>
+<div class="lt">
+<label>판 크기(mm)<input type="number" id="shw" value="300" min="10" step="10"> ×<input type="number" id="shh" value="200" min="10" step="10"></label>
+<label><select id="shp"><option value="">직접 입력</option><option value="300x200">300×200</option><option value="400x300">400×300</option><option value="600x400">600×400</option><option value="900x600">900×600</option></select></label>
+<label>파츠 간격(mm, 최소 3)<input type="number" id="shg" value="3" min="3" step=".5"></label>
+<label>가장자리 여백(mm)<input type="number" id="shm" value="3" min="0" step=".5"></label>
+<button id="shauto">⚡ 자동 배치</button>
+<label><input type="checkbox" id="shr"> 자동 배치 시 90° 회전 허용</label>
+</div>
+<div class="lt">
+<span id="shn">파츠를 클릭해 선택</span>
+<label>X<input type="number" id="shx" step=".5"></label><label>Y<input type="number" id="shy" step=".5"></label>
+<button id="shrot">↻ 90° 회전</button>
+<label><input type="checkbox" id="shs" checked> 간격만큼 자석 붙이기</label>
+<label><input type="checkbox" id="shc" checked> 칼선 표시</label>
+<button id="shfit">화면 맞춤</button><button id="sh100">실제 크기(100%)</button>
+<label>DPI<input type="number" id="shdpi" value="300" min="30" max="1200"></label><button id="shsave">배치 PNG 저장</button>
+</div>
+<div id="lc"><canvas id="lcv"></canvas></div><div id="lst"></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
@@ -201,9 +231,10 @@ for(let y=0;y<h;y++)for(let x=0;x<w;x++){let m=0;for(let k=-r;k<=r;k++){const yy
 function proc(src,o){const pd=0,w=src.width+2*pd,h=src.height+2*pd,c=cv(w,h);c.getContext('2d').drawImage(src,pd,pd);
 const p=c.getContext('2d').getImageData(0,0,w,h).data,A=new Float32Array(w*h);for(let i=0;i<w*h;i++)A[i]=p[i*4+3]/255;
 const M=dil(A,w,h,pd),pc=cv(w,h),ec=cv(w,h),pdt=pc.getContext('2d').createImageData(w,h),edt=ec.getContext('2d').createImageData(w,h),q=pdt.data,e=edt.data,E=new THREE.Color(o.edge);
-for(let i=0;i<w*h;i++){const x=i%w,y=(i-x)/w;let r=p[i*4],g=p[i*4+1],b=p[i*4+2];const a=M[i];if(A[i]<.5&&a>.5)r=g=b=255;
+for(let i=0;i<w*h;i++){const x=i%w,y=(i-x)/w;let r=p[i*4],g=p[i*4+1],b=p[i*4+2];const a=M[i],mg=r==255&&g==255&&b==254;if(A[i]<.5&&a>.5)r=g=b=255;
 if(o.cut&&a>.5&&(x==0||y==0||x==w-1||y==h-1||M[i-1]<.5||M[i+1]<.5||M[i-w]<.5||M[i+w]<.5)){r=230;g=0;b=120;q[i*4+3]=255}
-else q[i*4+3]=255*a*(Math.min(r,g,b)>215?o.wo:1);
+else q[i*4+3]=mg?0:255*a*(Math.min(r,g,b)>215?o.wo:1);
+if(mg)b=255;
 q[i*4]=r;q[i*4+1]=g;q[i*4+2]=b;e[i*4]=E.r*255;e[i*4+1]=E.g*255;e[i*4+2]=E.b*255;e[i*4+3]=a>.5?255:0}
 pc.getContext('2d').putImageData(pdt,0,0);ec.getContext('2d').putImageData(edt,0,0);return{pc,ec,w,h,M}}
 function holeOf(p,o){if(!p.hon||!p.holes||!p.holes.length)return[];const r=$('mt').checked?parts.find(q=>q.tab&&q.tab.on):null,tol=+$('tol').value||0;return p.holes.map(H=>r?{...H,w:r.tab.w+tol,h:o.t+tol}:H)}
@@ -216,7 +247,7 @@ k=0;for(let q=0;q<len;q++){while(z[k+1]<q)k++;const p=v[k];d[q]=(q-p)*(q-p)+g[o+
 for(let x=0;x<w;x++)one(f,x,w,h);for(let y=0;y<h;y++)one(f,y*w,1,w);return f}
 function grow(s,mm,k){const r=mm*k;if(!(r>.05))return{c:s,pd:0};const pd=Math.ceil(r)+2,w=s.width+2*pd,h=s.height+2*pd,c=cv(w,h),x=c.getContext('2d');x.drawImage(s,pd,pd);
 const im=x.getImageData(0,0,w,h),p=im.data,A=new Float32Array(w*h);for(let i=0;i<w*h;i++)A[i]=p[i*4+3]/255;const D=edt(A,w,h);if(!D)return{c:s,pd:0};
-for(let i=0;i<w*h;i++){const a=A[i];if(a>=1)continue;const m=Math.min(1,Math.max(0,r+.5-Math.sqrt(D[i])));if(m>a){const j=i*4;if(a<.5){p[j]=p[j+1]=p[j+2]=255}p[j+3]=Math.round(m*255)}}
+for(let i=0;i<w*h;i++){const a=A[i];if(a>=1)continue;const m=Math.min(1,Math.max(0,r+.5-Math.sqrt(D[i])));if(m>a){const j=i*4;if(a<.5){p[j]=p[j+1]=255;p[j+2]=254}p[j+3]=Math.round(m*255)}}
 x.putImageData(im,0,0);return{c,pd}}
 /* 파츠의 칼선 여유(mm): 파츠별 값(p.ol)이 있으면 그 값, 없으면(null) 전체 설정 */
 const olOf=p=>p.ol!=null?Math.max(0,+p.ol||0):($('acut').checked?Math.max(0,+$('acm').value||0):0);
