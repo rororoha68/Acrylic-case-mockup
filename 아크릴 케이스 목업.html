@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><title>아크릴 케이스 목업</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f1f3f7;--pn:#fff;--tx:#252b3b;--mu:#6b7488;--ln:#d5dae5;--ac:#4b5a8f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171e;--pn:#1e212b;--tx:#e6e9f2;--mu:#9099b0;--ln:#31364a;--ac:#8d9bd6}}
+:root[data-theme="dark"]{--bg:#15171e;--pn:#1e212b;--tx:#e6e9f2;--mu:#9099b0;--ln:#31364a;--ac:#8d9bd6}
+html,body{height:100%;margin:0}body{background:var(--bg);color:var(--tx);font:13px/1.5 "Noto Sans KR",system-ui,sans-serif;display:flex}
+#v{flex:1;position:relative;min-width:0}canvas{display:block;width:100%;height:100%}
+#hint{position:absolute;left:14px;bottom:12px;color:var(--mu);font-size:12px;pointer-events:none}
+aside{width:320px;background:var(--pn);border-left:1px solid var(--ln);overflow-y:auto;padding:14px}
+h1{font-size:16px;margin:0 0 8px}h2{font-size:13px;margin:16px 0 6px;color:var(--ac)}
+label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 0;color:var(--mu)}
+label b{color:var(--tx);font-weight:500;min-width:40px;text-align:right}
+input[type=range]{flex:1;accent-color:var(--ac)}select,button,input[type=number]{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:4px 7px}
+button{cursor:pointer}.w{width:100%;margin-top:5px}.g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.g input{width:100%;box-sizing:border-box}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.pr{display:flex;align-items:center;gap:6px;margin:3px 0}.pr button{flex:1;text-align:left}.pr button.on{border-color:var(--ac);color:var(--ac);font-weight:600}
+small{color:var(--mu)}
+@media (max-width:760px){body{flex-direction:column}aside{width:auto;height:50%;border-left:0;border-top:1px solid var(--ln)}}
+</style></head><body>
+<div id="v"><div id="hint">파츠를 클릭해 선택 · 화살표 축을 끌어 이동/회전 · 빈 곳 드래그로 시점 회전</div></div>
+<aside>
+<h1>아크릴 케이스 목업</h1>
+<h2>파츠 (면마다 이미지)</h2><div id="pl"></div>
+<div class="g2"><button id="add">＋ 이미지로 파츠 추가</button><button id="rst">기본 배치로 초기화</button></div>
+<input type="file" id="pf" accept="image/*" hidden><input type="file" id="af" accept="image/*" hidden>
+<h2>선택한 파츠: <span id="sn" style="color:var(--tx)">없음</span></h2>
+<input type="text" id="nm" placeholder="파츠 이름" style="width:100%;box-sizing:border-box;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:4px 7px;margin-bottom:5px">
+<div class="g2"><button id="mv">이동</button><button id="rt">회전</button></div>
+<div class="g2"><button id="rep">앞면 이미지 교체</button><button id="repb">뒷면 이미지 넣기</button></div>
+<div class="g2"><button id="bdel">뒷면 제거</button><button id="flip">시점 앞↔뒤</button></div>
+<input type="file" id="bf" accept="image/*" hidden>
+<button class="w" id="snap">겹침 해소(두께 방향으로 밀기)</button>
+<label><span><input type="checkbox" id="chk" checked> 겹침 검사 (겹치면 붉게 표시)</span></label>
+<label><span><input type="checkbox" id="trim" checked> 여백 자동 제거</span><span><input type="checkbox" id="keyc"> 모서리 색 투명</span></label>
+<label>이미지 해상도(DPI) → 크기 계산<input type="number" id="dpi" value="300" min="30" max="1200" style="width:70px"></label>
+<small>크기(mm) 가로 / 세로</small>
+<div class="g2"><input type="number" id="w" step=".5"><input type="number" id="h" step=".5"></div>
+<label><span><input type="checkbox" id="lock" checked> 비율 고정</span></label>
+<small>위치(mm) X / Y / Z</small><div class="g"><input type="number" id="px" step=".5"><input type="number" id="py" step=".5"><input type="number" id="pz" step=".5"></div>
+<small>회전(°) X / Y / Z</small><div class="g"><input type="number" id="rx" step="1"><input type="number" id="ry" step="1"><input type="number" id="rz" step="1"></div>
+<div class="g"><button id="x9">X +90°</button><button id="y9">Y +90°</button><button id="z9">Z +90°</button></div>
+<label>앞면 흰 잉크<select id="wi"><option value="">재질 따름</option><option value="1">있음(불투명)</option><option value="0.1">없음(투명)</option></select></label>
+<label>뒷면 흰 잉크<select id="wi2"><option value="">재질 따름</option><option value="1">있음(불투명)</option><option value="0.1">없음(투명)</option></select></label>
+<label>흰 테두리(칼선 여유)<input type="range" id="ol" min="0" max="10" value="0"><b id="olv"></b></label>
+<div class="g2"><button id="dup">복제</button><button id="del">삭제</button></div>
+<h2>스탠드 꽂는 부분 (선택 파츠)</h2>
+<label><span><input type="checkbox" id="tabon"> 꽂는 부분 만들기(아래쪽)</span></label>
+<small>폭 / 길이(mm)</small><div class="g2"><input type="number" id="tw" step=".5" value="20"><input type="number" id="tl" step=".5" value="3"></div>
+<h2>구멍 (선택 파츠)</h2>
+<label><span><input type="checkbox" id="holeon"> 구멍 뚫기</span></label>
+<div class="g"><select id="hsel"></select><button id="hadd">＋ 추가</button><button id="hdel">− 삭제</button></div>
+<small>위치 X / Y(mm, 판 중심 기준)</small><div class="g2"><input type="number" id="hx" step=".5" value="0"><input type="number" id="hy" step=".5" value="0"></div>
+<small>크기 가로 / 세로(mm)</small><div class="g2"><input type="number" id="hw" step=".1" value="10"><input type="number" id="hh" step=".1" value="3"></div>
+<label>구멍 회전(°)<input type="number" id="ha" value="0" style="width:70px"></label>
+<button class="w" id="aim">스탠드 위치로 구멍 맞추기</button>
+<label><span><input type="checkbox" id="mt"> 구멍 = 꽂는 부분 + 공차</span><input type="number" id="tol" value="0.1" step=".05" min="0" style="width:60px"></label>
+<h2>파츠 이미지 저장</h2>
+<button class="w" id="expp">선택 파츠 저장 (구멍·꽂는 부분 포함)</button>
+<button class="w" id="expa">전체 파츠 저장 (zip)</button>
+<small>칼선 표시를 켜면 분홍색 칼선이 이미지에 함께 그려집니다.</small>
+<h2>맞춤 도구</h2>
+<label>이동 스냅<select id="ts"><option value="0">없음</option><option value=".5">0.5mm</option><option value="1">1mm</option><option value="5">5mm</option></select></label>
+<label>회전 스냅<select id="rs"><option value="0">없음</option><option value="15">15°</option><option value="45">45°</option><option value="90" selected>90°</option></select></label>
+<label>분해 ↔ 조립<input type="range" id="ex" min="0" max="1" step=".01" value="0"></label>
+<h2>재질</h2>
+<label>종류<select id="mat"><option value="clear">투명 아크릴</option><option value="frost">반투명(프로스트)</option><option value="white">불투명 화이트</option><option value="smoke">스모크</option></select></label>
+<label>인쇄 외 바탕 불투명도<input type="range" id="wo" min="0" max="1" step=".01"><b id="wov"></b></label>
+<label>광택(낮을수록 반짝)<input type="range" id="ro" min="0" max="1" step=".01" value=".15"><b id="rov"></b></label>
+<label>아크릴 두께<input type="range" id="th" min="1" max="10" step=".5" value="3"><b id="thv"></b></label>
+<label><span><input type="checkbox" id="cut"> 칼선 표시</span></label>
+<button class="w" id="shot">현재 화면 저장(PNG)</button>
+</aside>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const $=i=>document.getElementById(i),dg=THREE.MathUtils.degToRad;
+const SR={front:[60,30,505,359],back:[625,30,505,359],top:[64,410,505,258],bottom:[625,410,505,258],left:[52,722,260,404],right:[326,722,262,404],fig:[620,700,540,430]};
+const NM={front:'앞',back:'뒤',left:'좌',right:'우',top:'상',bottom:'하',fig:'내부파츠'};
+const P={clear:[.18,'#ffffff','#a6e6da',.55],frost:[.55,'#ffffff','#dcefff',.75],white:[1,'#ffffff','#ffffff',1],smoke:[.6,'#3a3d44','#2c2e33',.85]};
+const SC=100/495;let parts=[],sel=null,img=new Image(),bg=[91,91,91],pid=0;
+const V=$('v'),ren=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+ren.outputEncoding=THREE.sRGBEncoding;ren.setPixelRatio(Math.min(devicePixelRatio,2));V.prepend(ren.domElement);
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,1,3000);cam.position.set(150,100,210);
+const ctl=new THREE.OrbitControls(cam,ren.domElement);ctl.enableDamping=true;
+sc.add(new THREE.HemisphereLight(0xffffff,0x8890a8,.9));
+const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(150,250,180);sc.add(dl);
+const dl2=new THREE.DirectionalLight(0xbfd4ff,.4);dl2.position.set(-180,60,-150);sc.add(dl2);
+const root=new THREE.Group();sc.add(root);
+const tc=new THREE.TransformControls(cam,ren.domElement);sc.add(tc);tc.setSize(.8);
+tc.addEventListener('dragging-changed',e=>ctl.enabled=!e.value);
+tc.addEventListener('objectChange',()=>{if(!sel)return;const k=kx(),g=sel.g;sel.pos=[g.position.x/k,g.position.y/k,g.position.z/k];sel.rot=[g.rotation.x,g.rotation.y,g.rotation.z].map(r=>+(r*180/Math.PI).toFixed(1));sync();sched()});
+const kx=()=>1+ +$('ex').value*.8;
+function size(){ren.setSize(V.clientWidth,V.clientHeight);cam.aspect=V.clientWidth/V.clientHeight;cam.updateProjectionMatrix()}addEventListener('resize',size);
+function cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
+function keyBg(c,col){const x=c.getContext('2d'),d=x.getImageData(0,0,c.width,c.height),p=d.data;col=col||bg;
+for(let i=0;i<p.length;i+=4){const s=Math.abs(p[i]-col[0])+Math.abs(p[i+1]-col[1])+Math.abs(p[i+2]-col[2]);p[i+3]=Math.min(p[i+3],255*Math.min(1,Math.max(0,(s-18)/30)))}x.putImageData(d,0,0)}
+function trim(c){const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>20){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+if(x1<0)return c;const o=cv(x1-x0+1,y1-y0+1);o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);return o}
+function dil(A,w,h,r){if(!r)return A;const T=new Float32Array(w*h),B=new Float32Array(w*h);
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){let m=0;for(let k=-r;k<=r;k++){const xx=x+k;if(xx>=0&&xx<w&&A[y*w+xx]>m)m=A[y*w+xx]}T[y*w+x]=m}
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){let m=0;for(let k=-r;k<=r;k++){const yy=y+k;if(yy>=0&&yy<h&&T[yy*w+x]>m)m=T[yy*w+x]}B[y*w+x]=m}return B}
+function proc(src,o){const pd=o.ol,w=src.width+2*pd,h=src.height+2*pd,c=cv(w,h);c.getContext('2d').drawImage(src,pd,pd);
+const p=c.getContext('2d').getImageData(0,0,w,h).data,A=new Float32Array(w*h);for(let i=0;i<w*h;i++)A[i]=p[i*4+3]/255;
+const M=dil(A,w,h,pd),pc=cv(w,h),ec=cv(w,h),pdt=pc.getContext('2d').createImageData(w,h),edt=ec.getContext('2d').createImageData(w,h),q=pdt.data,e=edt.data,E=new THREE.Color(o.edge);
+for(let i=0;i<w*h;i++){const x=i%w,y=(i-x)/w;let r=p[i*4],g=p[i*4+1],b=p[i*4+2];const a=M[i];if(A[i]<.5&&a>.5)r=g=b=255;
+if(o.cut&&a>.5&&(x==0||y==0||x==w-1||y==h-1||M[i-1]<.5||M[i+1]<.5||M[i-w]<.5||M[i+w]<.5)){r=230;g=0;b=120;q[i*4+3]=255}
+else q[i*4+3]=255*a*(Math.min(r,g,b)>215?o.wo:1);
+q[i*4]=r;q[i*4+1]=g;q[i*4+2]=b;e[i*4]=E.r*255;e[i*4+1]=E.g*255;e[i*4+2]=E.b*255;e[i*4+3]=a>.5?255:0}
+pc.getContext('2d').putImageData(pdt,0,0);ec.getContext('2d').putImageData(edt,0,0);return{pc,ec,w,h,M}}
+function holeOf(p,o){if(!p.hon||!p.holes||!p.holes.length)return[];const r=$('mt').checked?parts.find(q=>q.tab&&q.tab.on):null,tol=+$('tol').value||0;return p.holes.map(H=>r?{...H,w:r.tab.w+tol,h:o.t+tol}:H)}
+function prep(s,p,o){const T=p.tab,H=holeOf(p,o),hx=s.width/p.w,hy=s.height/p.h,l=T&&T.on?Math.round(T.l*hy):0;if(!l&&!H.length)return s;const c=cv(s.width,s.height+l),x=c.getContext('2d');x.drawImage(s,0,0);
+if(l){const tw=T.w*hx;x.fillStyle='#ffffff';x.fillRect(s.width/2-tw/2,s.height-1,tw,l+1)}
+for(const H1 of H){x.save();x.globalCompositeOperation='destination-out';x.translate(s.width/2+H1.x*hx,s.height/2-H1.y*hy);x.rotate(-H1.a*Math.PI/180);x.fillRect(-H1.w*hx/2,-H1.h*hy/2,H1.w*hx,H1.h*hy);x.restore()}return c}
+function mk(p,o){const t=o.t,wf=p.wi==null||p.wi===''?o.wo:+p.wi,wb=p.wi2==null||p.wi2===''?o.wo:+p.wi2,tl=p.tab&&p.tab.on?p.tab.l:0,Sf=prep(p.src,p,o),{pc,ec,w:cw,h:ch,M:MM}=proc(Sf,{...o,wo:wf,ol:p.ol}),pw=p.w*cw/p.src.width,ph=p.h*ch/p.src.height,g=new THREE.Group(),tx=new THREE.CanvasTexture(pc);
+tx.encoding=THREE.sRGBEncoding;tx.anisotropy=8;
+const pm=new THREE.MeshStandardMaterial({map:tx,transparent:true,alphaTest:.04,side:THREE.DoubleSide,color:o.tint,roughness:o.ro,depthWrite:wf>.9}),f=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph),pm);f.position.z=t/2+.02;f.position.y=-tl/2;g.add(f);p.m={M:MM,w:cw,h:ch,pw,ph,t,tl};
+const et=new THREE.CanvasTexture(ec);et.encoding=THREE.sRGBEncoding;
+const em=new THREE.MeshStandardMaterial({map:et,transparent:true,opacity:o.eo,alphaTest:.5,side:THREE.DoubleSide,roughness:o.ro,depthWrite:o.eo>.9}),n=Math.min(16,Math.max(2,Math.round(t*2)));
+for(let i=0;i<=n;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph),em);m.position.z=-t/2+t*i/n;m.position.y=-tl/2;g.add(m)}
+if(p.src2){const b=proc(prep(p.src2,p,o),{...o,wo:wb,ol:p.ol}),bt=new THREE.CanvasTexture(b.pc);bt.encoding=THREE.sRGBEncoding;bt.anisotropy=8;pm.side=THREE.FrontSide;
+const bm=new THREE.Mesh(new THREE.PlaneGeometry(p.w*b.w/p.src2.width,p.h*b.h/p.src2.height),new THREE.MeshStandardMaterial({map:bt,transparent:true,alphaTest:.04,side:THREE.FrontSide,color:o.tint,roughness:o.ro,depthWrite:wb>.9}));bm.rotation.y=Math.PI;bm.position.z=-t/2-.02;bm.position.y=-tl/2;g.add(bm)}return g}
+let chk=false;const sched=()=>{chk=true},V3=new THREE.Vector3();
+function samp(p){const{M,w,h,pw,ph}=p.m,o=[];for(let y=4;y<h-4;y+=6)for(let x=4;x<w-4;x+=6){const i=y*w+x;if(M[i]>.5&&M[i-3]>.5&&M[i+3]>.5&&M[i-3*w]>.5&&M[i+3*w]>.5)o.push([(x/w-.5)*pw,(.5-y/h)*ph-p.m.tl/2])}return o}
+function cnt(A,B){let n=0;const m=B.m,ht=m.t/2-.05;for(const q of A.pts){V3.set(q[0],q[1],0).applyMatrix4(A.g.matrixWorld);B.g.worldToLocal(V3);const yy=V3.y+m.tl/2;if(Math.abs(V3.z)<ht&&Math.abs(V3.x)<m.pw/2&&Math.abs(yy)<m.ph/2){const ix=Math.floor((V3.x/m.pw+.5)*m.w),iy=Math.floor((.5-yy/m.ph)*m.h);if(m.M[iy*m.w+ix]>.5)n++}}return n}
+const ovl=(A,B)=>cnt(A,B)+cnt(B,A);
+function overlap(){const on=$('chk').checked&&+$('ex').value==0;root.updateMatrixWorld(true);parts.forEach(p=>p.ov=false);
+if(on)for(let i=0;i<parts.length;i++)for(let j=i+1;j<parts.length;j++){const A=parts[i],B=parts[j];if(A.vis&&B.vis&&ovl(A,B)>3)A.ov=B.ov=true}
+parts.forEach(p=>{const m=p.g.children[0].material;m.emissive.set(p.ov?0xff2040:0);m.emissiveIntensity=.4});list()}
+const gopt=()=>{const pr=P[$('mat').value];return{wo:+$('wo').value,tint:pr[1],edge:pr[2],eo:pr[3],ro:+$('ro').value,cut:$('cut').checked,t:+$('th').value}};
+function place(p){const k=kx();p.g.position.set(p.pos[0]*k,p.pos[1]*k,p.pos[2]*k);p.g.rotation.set(...p.rot.map(dg))}
+function build(p){if(p.g)root.remove(p.g);p.g=mk(p,gopt());p.pts=samp(p);p.g.userData.pid=p.id;root.add(p.g);place(p);p.g.visible=p.vis;if(sel===p)attach();sched()}
+function attach(){if(sel&&sel.vis&&+$('ex').value==0)tc.attach(sel.g);else tc.detach()}
+const buildAll=()=>{parts.forEach(build);$('wov').textContent=(+$('wo').value).toFixed(2);$('rov').textContent=(+$('ro').value).toFixed(2);$('thv').textContent=$('th').value+'mm'};
+const FD=['w','h','px','py','pz','rx','ry','rz'];
+function sync(){const p=sel;$('sn').textContent=p?p.name:'없음';if(document.activeElement!==$('nm'))$('nm').value=p?p.name:'';if(!p)return;const v=[p.w,p.h,...p.pos,...p.rot];FD.forEach((id,i)=>{if(document.activeElement!==$(id))$(id).value=+(+v[i]).toFixed(2)});$('ol').value=p.ol;$('olv').textContent=p.ol+'px';$('wi').value=p.wi==null?'':p.wi;$('wi2').value=p.wi2==null?'':p.wi2;const T=p.tab||{on:false,w:20,l:+$('th').value},H=(p.holes&&p.holes[p.hi||0])||{x:0,y:0,w:10,h:+$('th').value,a:0},tol=+$('tol').value||0,r=$('mt').checked&&parts.find(q=>q.tab&&q.tab.on),sv=(id,v)=>{if(document.activeElement!==$(id))$(id).value=v};
+$('tabon').checked=T.on;sv('tw',T.w);sv('tl',T.l);$('holeon').checked=!!p.hon;sv('hx',H.x);sv('hy',H.y);sv('ha',H.a);$('hw').disabled=$('hh').disabled=!!r;sv('hw',r?+(r.tab.w+tol).toFixed(2):H.w);sv('hh',r?+(+$('th').value+tol).toFixed(2):H.h);$('hsel').innerHTML=(p.holes||[]).map((_,i)=>'<option value="'+i+'">구멍 '+(i+1)+'</option>').join('');$('hsel').value=p.hi||0}
+function list(){const L=$('pl');L.innerHTML='';parts.forEach(p=>{const d=document.createElement('div');d.className='pr';const c=document.createElement('input');c.type='checkbox';c.checked=p.vis;c.onchange=()=>{p.vis=c.checked;p.g.visible=p.vis;attach()};
+const b=document.createElement('button');b.textContent=(p.ov?'⚠ ':'')+p.name;b.className=p===sel?'on':'';b.onclick=()=>choose(p);d.append(c,b);L.appendChild(d)})}
+function choose(p){sel=p;attach();list();sync()}
+function addPart(name,src,w,pos,rot,ol){const p={id:++pid,name,src,w,h:w*src.height/src.width,pos,rot,ol:ol||0,vis:true};parts.push(p);build(p);return p}
+function init(){parts.forEach(p=>root.remove(p.g));parts=[];sel=null;tc.detach();const t=+$('th').value,W=100,H=71,D=52,C={front:'#8fa3d6',back:'#d68f9b',left:'#8fd6b0',right:'#d6c98f',top:'#b08fd6',bottom:'#8fd0d6',fig:'#e08a5a'};
+const a=(k,w,h,pos,rot)=>{const c=cv(Math.round(w*4),Math.round(h*4)),x=c.getContext('2d');x.fillStyle=C[k];x.fillRect(0,0,c.width,c.height);return addPart(NM[k],c,w,pos,rot)};
+a('front',W,H,[0,0,D/2+t/2],[0,0,0]);a('back',W,H,[0,0,-D/2-t/2],[0,180,0]);a('left',D,H-2*t,[-(W/2-t/2),0,0],[0,-90,0]);a('right',D,H-2*t,[W/2-t/2,0,0],[0,90,0]);
+a('top',W,D,[0,H/2-t/2,0],[-90,0,0]);a('bottom',W,D,[0,-(H/2-t/2),0],[90,0,0]);a('fig',40,50,[0,-H/2+t+25,0],[0,0,0]);list();sync()}
+function load(file,cb){const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{let c=cv(i.width,i.height);c.getContext('2d').drawImage(i,0,0);
+if($('keyc').checked){const d=c.getContext('2d').getImageData(0,0,1,1).data;keyBg(c,[d[0],d[1],d[2]])}if($('trim').checked)c=trim(c);cb(c,file.name.replace(/\.[^.]+$/,''))};i.src=r.result};r.readAsDataURL(file)}
+$('rep').onclick=()=>sel&&$('pf').click();$('add').onclick=()=>$('af').click();
+$('pf').onchange=e=>{const f=e.target.files[0];if(f&&sel)load(f,c=>{const m=25.4/Math.max(30,+$('dpi').value||300);sel.src=c;sel.w=c.width*m;sel.h=c.height*m;build(sel);sync()});e.target.value=''};
+$('af').onchange=e=>{const f=e.target.files[0];if(f)load(f,(c,n)=>choose(addPart(n,c,c.width*25.4/Math.max(30,+$('dpi').value||300),[0,0,0],[0,0,0])));e.target.value=''};
+FD.forEach(id=>$(id).oninput=()=>{const p=sel;if(!p||$(id).value==='')return;const v=+$(id).value;
+if(id=='w'){p.w=v;if($('lock').checked)p.h=v*p.src.height/p.src.width}else if(id=='h'){p.h=v;if($('lock').checked)p.w=v*p.src.width/p.src.height}
+else if(id[0]=='p')p.pos['xyz'.indexOf(id[1])]=v;else p.rot['xyz'.indexOf(id[1])]=v;
+if(id=='w'||id=='h'){build(p);sync()}else{place(p);sched()}});
+['x','y','z'].forEach((a,i)=>$(a+'9').onclick=()=>{if(!sel)return;sel.rot[i]=((sel.rot[i]+90)%360);place(sel);sync();sched()});
+$('ol').oninput=()=>{if(sel){sel.ol=+$('ol').value;build(sel);sync()}};
+$('dup').onclick=()=>{if(sel){const n=addPart(sel.name+' 복사',sel.src,sel.w,[sel.pos[0]+10,sel.pos[1],sel.pos[2]],[...sel.rot],sel.ol);n.src2=sel.src2;n.wi=sel.wi;n.wi2=sel.wi2;n.tab=sel.tab&&{...sel.tab};n.holes=sel.holes&&sel.holes.map(h=>({...h}));n.hon=sel.hon;n.hi=0;build(n);choose(n)}};
+$('del').onclick=()=>{if(!sel)return;root.remove(sel.g);parts=parts.filter(p=>p!==sel);sel=null;tc.detach();list();sync();sched()};
+$('nm').oninput=()=>{if(sel){sel.name=$('nm').value;$('sn').textContent=sel.name;list()}};
+$('wi').onchange=()=>{if(sel){sel.wi=$('wi').value;build(sel)}};$('wi2').onchange=()=>{if(sel){sel.wi2=$('wi2').value;build(sel)}};
+const tabU=()=>{if(!sel)return;sel.tab={on:$('tabon').checked,w:+$('tw').value||1,l:+$('tl').value||0};buildAll();sync()};
+['tabon','tw','tl'].forEach(i=>$(i).oninput=tabU);
+const holeU=()=>{if(!sel)return;sel.hon=$('holeon').checked;if(sel.hon&&!(sel.holes&&sel.holes.length)){sel.holes=[{x:0,y:0,w:10,h:+$('th').value,a:0}];sel.hi=0}
+const H=sel.holes&&sel.holes[sel.hi||0];if(H){H.x=+$('hx').value;H.y=+$('hy').value;H.w=+$('hw').value||1;H.h=+$('hh').value||1;H.a=+$('ha').value}$('mt').checked?buildAll():build(sel);sync()};
+$('hadd').onclick=()=>{if(!sel)return;sel.holes=sel.holes||[];sel.holes.push({x:12*sel.holes.length,y:0,w:10,h:+$('th').value,a:0});sel.hi=sel.holes.length-1;sel.hon=true;build(sel);sync()};
+$('hdel').onclick=()=>{if(!sel||!sel.holes||!sel.holes.length)return;sel.holes.splice(sel.hi||0,1);sel.hi=Math.max(0,(sel.hi||0)-1);build(sel);sync()};
+$('hsel').onchange=()=>{if(sel){sel.hi=+$('hsel').value;sync()}};
+let DL=null;try{claude.use('downloads').then(d=>DL=d).catch(()=>{})}catch(e){}
+const blobOf=c=>new Promise(r=>c.toBlob(r,'image/png')),fn=s=>(s||'part').replace(/[\\/:*?"<>|]/g,'_');
+async function save(name,data){if(!DL){alert('이 화면에서는 파일 저장을 지원하지 않습니다. claude.ai에서 열어주세요.');return}try{await DL.save({filename:name,data})}catch(e){}}
+const expC=(p,o)=>{const q={...o,wo:1,ol:p.ol},n=fn(p.name);return[[n+'_앞',proc(prep(p.src,p,o),q).pc]].concat(p.src2?[[n+'_뒤',proc(prep(p.src2,p,o),q).pc]]:[])};
+$('expp').onclick=async()=>{if(!sel)return;const fs=expC(sel,gopt());if(fs.length==1)save(fs[0][0]+'.png',await blobOf(fs[0][1]));else{const z=new JSZip();for(const[n,c]of fs)z.file(n+'.png',await blobOf(c));save(fn(sel.name)+'.zip',await z.generateAsync({type:'blob'}))}};
+$('expa').onclick=async()=>{const z=new JSZip();for(const p of parts)for(const[n,c]of expC(p,gopt()))z.file(n+'.png',await blobOf(c));save('acrylic-parts.zip',await z.generateAsync({type:'blob'}))};
+['holeon','hx','hy','hw','hh','ha'].forEach(i=>$(i).oninput=holeU);
+$('mt').onchange=$('tol').oninput=()=>{buildAll();sync()};
+$('aim').onclick=()=>{const B=sel,A=parts.find(q=>q.tab&&q.tab.on&&q!==B);if(!B||!A||+$('ex').value)return;root.updateMatrixWorld(true);
+const v=A.g.localToWorld(new THREE.Vector3(0,-(A.h/2+A.tab.l/2),0));B.g.worldToLocal(v);
+const d=new THREE.Vector3(1,0,0).applyQuaternion(A.g.quaternion).applyQuaternion(B.g.quaternion.clone().invert());
+B.holes=B.holes||[];if(!B.holes.length)B.holes.push({x:0,y:0,w:10,h:+$('th').value,a:0});const hq=B.holes[B.hi||0]||B.holes[0];hq.x=+v.x.toFixed(2);hq.y=+v.y.toFixed(2);hq.a=Math.round(Math.atan2(d.y,d.x)*180/Math.PI);B.hon=true;build(B);sync()};
+$('repb').onclick=()=>sel&&$('bf').click();
+$('bf').onchange=e=>{const f=e.target.files[0];if(f&&sel)load(f,c=>{sel.src2=c;build(sel)});e.target.value=''};
+$('bdel').onclick=()=>{if(sel&&sel.src2){sel.src2=null;build(sel)}};
+$('flip').onclick=()=>{cam.position.x*=-1;cam.position.z*=-1};$('chk').onchange=sched;
+$('snap').onclick=()=>{const p=sel;if(!p||+$('ex').value)return;const base=[...p.pos],nrm=new THREE.Vector3(0,0,1).applyEuler(new THREE.Euler(...p.rot.map(dg)));
+const hit=()=>{place(p);root.updateMatrixWorld(true);return parts.some(q=>q!==p&&q.vis&&ovl(p,q)>3)};
+if(!hit())return;for(let d=.25;d<=10;d+=.25)for(const s of[1,-1]){p.pos=base.map((v,i)=>v+nrm.getComponent(i)*d*s);if(!hit()){sync();sched();return}}p.pos=base;place(p);sync()};
+$('mv').onclick=()=>tc.setMode('translate');$('rt').onclick=()=>tc.setMode('rotate');
+$('ts').onchange=()=>tc.setTranslationSnap(+$('ts').value||null);$('rs').onchange=()=>tc.setRotationSnap(+$('rs').value?dg(+$('rs').value):null);
+$('ts').onchange();$('rs').onchange();
+$('mat').onchange=()=>{$('wo').value=P[$('mat').value][0];buildAll()};
+['wo','ro','th','cut'].forEach(i=>$(i).addEventListener('input',buildAll));
+$('ex').oninput=()=>{parts.forEach(place);attach();sched()};$('rst').onclick=()=>init();
+$('shot').onclick=async()=>{const v=tc.visible;tc.visible=false;ren.render(sc,cam);const pr=blobOf(ren.domElement);tc.visible=v;save('acrylic-mockup.png',await pr)};
+let dn=null;const rc=new THREE.Raycaster(),cvs=ren.domElement;
+cvs.addEventListener('pointerdown',e=>dn=[e.clientX,e.clientY]);
+cvs.addEventListener('pointerup',e=>{if(!dn||tc.dragging||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>5)return;const r=cvs.getBoundingClientRect();
+rc.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-((e.clientY-r.top)/r.height*2-1)},cam);const h=rc.intersectObjects(root.children.filter(g=>g.visible),true)[0];
+if(h){let o=h.object;while(o&&o.userData.pid==null)o=o.parent;const p=parts.find(q=>q.id==o.userData.pid);if(p)choose(p)}});
+$('wo').value=P.clear[0];size();init();
+(function loop(){requestAnimationFrame(loop);if(chk){chk=false;overlap()}ctl.update();ren.render(sc,cam)})();
+</script></body></html>
