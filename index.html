@@ -28,6 +28,18 @@ small{color:var(--mu)}input[type=number]{cursor:ew-resize;touch-action:pan-y}
 input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);border-radius:6px;background:var(--bg);cursor:pointer}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:4px 0}.g4 button{padding:4px 2px;font-size:12px}
 @media (max-width:760px){body{flex-direction:column}aside{width:auto;height:50%;border-left:0;border-top:1px solid var(--ln)}.mw{flex-direction:column}#mnav{width:auto;max-height:34%;border-right:0;border-bottom:1px solid var(--ln)}}
+
+/* ===== 옵션별 도움말(?) 버튼 + 팝업 ===== */
+.hb{display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;padding:0;margin:0;border-radius:50%;font-size:12px;font-weight:700;line-height:1;color:var(--ac);background:var(--bg);border:1px solid var(--ac);vertical-align:middle}
+.hb:hover,.hb.on{background:var(--ac);color:var(--pn)}
+small .hb,h1 .hb,h2 .hb{margin-left:6px}
+.hr{display:flex;align-items:center;gap:4px;min-width:0}.hr.wm{margin-top:5px}
+.hr>:not(.hb){flex:1;min-width:0}.hr>.w{margin-top:0;width:auto}
+label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:auto}
+#hpop{position:fixed;z-index:40;width:min(340px,calc(100vw - 24px));max-height:min(70vh,520px);display:flex;flex-direction:column;background:var(--pn);color:var(--tx);border:1px solid var(--ac);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.35);overflow:hidden}#hpop[hidden]{display:none}
+#hpop .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--ln)}#hpop .ph b{font-size:14px;color:var(--ac)}#hpop .px{padding:1px 7px;line-height:1.3}
+#hpop .pb{padding:8px 14px;overflow-y:auto;line-height:1.6}#hpop .pb p,#hpop .pb li{margin:4px 0}#hpop .pb ul{padding-left:18px;margin:6px 0}
+#hpop .pf{padding:7px 10px;border-top:1px solid var(--ln);text-align:right}
 </style></head><body>
 <div id="v"><div id="tip" hidden></div><div id="hint">파츠를 클릭해 선택 · 화살표 축을 끌어 이동/회전 · 빈 곳 드래그로 시점 회전</div></div>
 <aside>
@@ -66,7 +78,8 @@ input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);bo
 <div class="g"><button id="x9">X +90°</button><button id="y9">Y +90°</button><button id="z9">Z +90°</button></div>
 <label>앞면 흰 잉크<select id="wi"><option value="">재질 따름</option><option value="1">있음(불투명)</option><option value="0.1">없음(투명)</option></select></label>
 <label>뒷면 흰 잉크<select id="wi2"><option value="">재질 따름</option><option value="1">있음(불투명)</option><option value="0.1">없음(투명)</option></select></label>
-<label>흰 테두리(칼선 여유)<input type="range" id="ol" min="0" max="10" value="0"><b id="olv"></b></label>
+<label>칼선 여유 (이 파츠)<select id="olm"><option value="g">전체 설정 따름</option><option value="c">직접 지정</option><option value="n">없음</option></select></label>
+<label>칼선 여유(mm)<input type="range" id="ol" min=".1" max="10" step=".1" value="2"><b id="olv"></b></label>
 <div class="g2"><button id="dup">복제</button><button id="del">삭제</button></div>
 <h2>스탠드 꽂는 부분 (선택 파츠)</h2>
 <label><span><input type="checkbox" id="tabon"> 꽂는 부분 만들기(아래쪽)</span></label>
@@ -96,6 +109,10 @@ input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);bo
 <label>인쇄 외 바탕 불투명도<input type="range" id="wo" min="0" max="1" step=".01"><b id="wov"></b></label>
 <label>광택(낮을수록 반짝)<input type="range" id="ro" min="0" max="1" step=".01" value=".15"><b id="rov"></b></label>
 <label>아크릴 두께<input type="range" id="th" min="1" max="10" step=".5" value="3"><b id="thv"></b></label>
+<h2>아크릴 칼선 (자동 생성)</h2>
+<label><span><input type="checkbox" id="acut" checked> 칼선 자동 생성</span></label>
+<label>기본 칼선 여유(mm)<input type="range" id="acm" min="0" max="10" step=".1" value="2"><b id="acv"></b></label>
+<small>그림 외곽에서 바깥쪽으로 이 간격(mm)만큼 띄워 칼선을 만들고, 그 사이는 흰 아크릴로 채웁니다. 파츠를 선택하면 「칼선 여유 (이 파츠)」에서 파츠별로 따로 정할 수 있습니다.</small>
 <h2>저장</h2>
 <button class="w" id="expp">선택 파츠 저장 (구멍·꽂는 부분 포함)</button>
 <button class="w" id="expa">전체 파츠 저장 (zip)</button>
@@ -127,7 +144,7 @@ input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);bo
 <article data-g="선택한 파츠" data-t="크기 · 비율 고정"><p>가로/세로를 mm로 입력합니다. <b>비율 고정</b>이 켜져 있으면 한쪽을 바꿀 때 다른 쪽이 원본 비율로 따라옵니다. 아래의 「오브젝트 영역」은 스냅·겹침 검사가 쓰는 실제 그림 영역 크기입니다.</p></article>
 <article data-g="선택한 파츠" data-t="위치 · 회전 · X/Y/Z +90°"><p>위치(mm)와 회전(°)을 숫자로 직접 입력합니다. <b>X/Y/Z +90°</b> 버튼은 해당 축으로 90°씩 바로 돌립니다.</p></article>
 <article data-g="선택한 파츠" data-t="앞면 · 뒷면 흰 잉크"><p>파츠마다 앞면/뒷면을 따로 정합니다. <b>있음</b>은 흰색 계열도 꽉 차게, <b>없음</b>은 흰 부분이 투명하게 비치게 보여 줍니다. <b>재질 따름</b>은 재질 설정의 불투명도를 따릅니다.</p></article>
-<article data-g="선택한 파츠" data-t="흰 테두리(칼선 여유)"><p>선택한 파츠(주로 아크릴 스탠드)의 그림 외곽에 흰 테두리를 0~10px 추가합니다.</p></article>
+<article data-g="선택한 파츠" data-t="칼선 여유 (파츠별, mm)"><p>선택한 파츠의 그림 외곽에서 바깥쪽으로 칼선을 얼마나 띄울지 mm로 정합니다. 그림과 칼선 사이는 흰 아크릴로 채워집니다.</p><ul><li><b>전체 설정 따름</b>: 「아크릴 칼선」의 기본값(처음 2mm)을 그대로 씁니다. 기본값을 바꾸면 이 파츠도 같이 바뀝니다.</li><li><b>직접 지정</b>: 슬라이더로 0.1~10mm 사이에서 이 파츠만 따로 정합니다.</li><li><b>없음</b>: 이 파츠는 칼선을 만들지 않고 그림 모양 그대로 둡니다.</li><li>꽂는 부분과 구멍은 칼선 바깥에서 붙고 뚫리므로 입력한 mm 크기 그대로 유지됩니다.</li><li>케이스 판(앞·뒤·좌·우·상·하)과 처음 견본의 내부파츠는 조립 치수가 어긋나지 않도록 「없음」으로 시작합니다. 새로 추가한 파츠는 「전체 설정 따름」으로 시작합니다.</li></ul></article>
 <article data-g="선택한 파츠" data-t="복제 · 삭제"><ul><li><b>복제</b>: 이미지·구멍·꽂는 부분까지 그대로 복사해 옆에 놓습니다.</li><li><b>삭제</b>: 선택한 파츠를 지웁니다.</li></ul></article>
 <article data-g="스탠드 꽂는 부분" data-t="꽂는 부분 만들기"><p>스탠드로 쓸 파츠를 선택하고 체크하면 그림 영역의 끝에 탭이 붙습니다. 탭 두께는 아크릴 두께와 같습니다.</p></article>
 <article data-g="스탠드 꽂는 부분" data-t="폭 · 길이 · 꽂는 면 · 위치 미세조정"><ul><li><b>폭/길이</b>: 탭의 크기(mm)입니다.</li><li><b>꽂는 면</b>: 아래(바닥)·위·왼쪽·오른쪽 중 탭이 붙는 쪽입니다.</li><li><b>위치 미세조정</b>: 탭을 가운데에서 좌우(또는 상하)로 옮깁니다.</li></ul></article>
@@ -143,6 +160,7 @@ input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);bo
 <article data-g="재질" data-t="종류"><p>투명 / 반투명(프로스트) / 불투명 화이트 / 스모크 중에서 고릅니다. 고르면 바탕 불투명도도 그에 맞게 바뀝니다.</p></article>
 <article data-g="재질" data-t="인쇄 외 바탕 불투명도 · 광택"><ul><li><b>바탕 불투명도</b>: 흰색에 가까운 부분이 얼마나 비칠지 정합니다.</li><li><b>광택</b>: 낮을수록 반짝입니다.</li></ul></article>
 <article data-g="재질" data-t="아크릴 두께"><p>1~10mm. 전체 판에 공통으로 적용되고 판 단면이 두께만큼 보입니다. 두께를 바꿔도 판 위치는 자동으로 다시 계산되지 않으니 직접 맞추거나 초기화하세요.</p></article>
+<article data-g="칼선" data-t="칼선 자동 생성 · 기본 여유(mm)"><p>그림의 외곽선에서 바깥쪽으로 일정 간격(mm)을 띄운 둥근 칼선을 자동으로 만듭니다. 칼선 안쪽 빈 곳은 흰 아크릴로 채워집니다.</p><ul><li><b>칼선 자동 생성</b>: 「전체 설정 따름」인 파츠에 칼선을 만들지 켜고 끕니다.</li><li><b>기본 칼선 여유(mm)</b>: 기본값은 2mm이고 0~10mm 사이에서 0.1mm 단위로 조절합니다.</li><li>파츠별로 다르게 하려면 파츠를 선택하고 「칼선 여유 (이 파츠)」를 바꾸세요.</li><li>칼선은 「보기」의 <b>칼선 표시</b>를 켜면 분홍색 선으로 보이고, 파츠 저장 PNG에도 같은 모양으로 반영됩니다.</li></ul></article>
 <article data-g="저장" data-t="선택 파츠 저장 · 전체 파츠 저장"><ul><li><b>선택 파츠 저장</b>: 구멍·꽂는 부분이 반영된 판을 투명 배경 PNG로 저장합니다(뒷면이 있으면 앞·뒤 두 장을 zip으로).</li><li><b>전체 파츠 저장(zip)</b>: 모든 판을 zip 하나로 묶습니다.</li><li>칼선 표시가 켜져 있으면 칼선도 함께 그려집니다.</li></ul></article>
 <article data-g="저장" data-t="프로젝트 저장 · 불러오기"><p>모든 파츠(이미지 포함)·위치·회전·구멍·꽂는 부분·재질·배경색 등을 .json 파일 하나로 저장합니다. 외부 백업이므로 클라우드·USB 등에 보관하세요. <b>불러오기</b>로 그대로 복원됩니다.</p></article>
 <article data-g="저장" data-t="자동 저장"><p>켜져 있으면 작업이 바뀔 때마다 이 브라우저(IndexedDB)에 저장되고, 다시 열면 자동 복원됩니다. 브라우저 데이터를 지우거나 다른 기기·브라우저에서는 복원되지 않으니 중요한 작업은 .json으로도 저장하세요.</p></article>
@@ -180,7 +198,7 @@ if(x1<0)return c;const o=cv(x1-x0+1,y1-y0+1);o.getContext('2d').drawImage(c,x0,y
 function dil(A,w,h,r){if(!r)return A;const T=new Float32Array(w*h),B=new Float32Array(w*h);
 for(let y=0;y<h;y++)for(let x=0;x<w;x++){let m=0;for(let k=-r;k<=r;k++){const xx=x+k;if(xx>=0&&xx<w&&A[y*w+xx]>m)m=A[y*w+xx]}T[y*w+x]=m}
 for(let y=0;y<h;y++)for(let x=0;x<w;x++){let m=0;for(let k=-r;k<=r;k++){const yy=y+k;if(yy>=0&&yy<h&&T[yy*w+x]>m)m=T[yy*w+x]}B[y*w+x]=m}return B}
-function proc(src,o){const pd=o.ol,w=src.width+2*pd,h=src.height+2*pd,c=cv(w,h);c.getContext('2d').drawImage(src,pd,pd);
+function proc(src,o){const pd=0,w=src.width+2*pd,h=src.height+2*pd,c=cv(w,h);c.getContext('2d').drawImage(src,pd,pd);
 const p=c.getContext('2d').getImageData(0,0,w,h).data,A=new Float32Array(w*h);for(let i=0;i<w*h;i++)A[i]=p[i*4+3]/255;
 const M=dil(A,w,h,pd),pc=cv(w,h),ec=cv(w,h),pdt=pc.getContext('2d').createImageData(w,h),edt=ec.getContext('2d').createImageData(w,h),q=pdt.data,e=edt.data,E=new THREE.Color(o.edge);
 for(let i=0;i<w*h;i++){const x=i%w,y=(i-x)/w;let r=p[i*4],g=p[i*4+1],b=p[i*4+2];const a=M[i];if(A[i]<.5&&a>.5)r=g=b=255;
@@ -189,7 +207,21 @@ else q[i*4+3]=255*a*(Math.min(r,g,b)>215?o.wo:1);
 q[i*4]=r;q[i*4+1]=g;q[i*4+2]=b;e[i*4]=E.r*255;e[i*4+1]=E.g*255;e[i*4+2]=E.b*255;e[i*4+3]=a>.5?255:0}
 pc.getContext('2d').putImageData(pdt,0,0);ec.getContext('2d').putImageData(edt,0,0);return{pc,ec,w,h,M}}
 function holeOf(p,o){if(!p.hon||!p.holes||!p.holes.length)return[];const r=$('mt').checked?parts.find(q=>q.tab&&q.tab.on):null,tol=+$('tol').value||0;return p.holes.map(H=>r?{...H,w:r.tab.w+tol,h:o.t+tol}:H)}
-function prep(s,p,o,fl){const T=p.tab,H=holeOf(p,o),hx=s.width/p.w,hy=s.height/p.h;let sd=T&&T.on?T.side||'b':'b';if(fl&&sd=='l')sd='r';else if(fl&&sd=='r')sd='l';const hz=sd=='l'||sd=='r',l=T&&T.on?Math.round(T.l*(hz?hx:hy)):0;if(!l&&!H.length)return s;const dx=sd=='l'?l:0,dy=sd=='t'?l:0,c=cv(s.width+(hz?l:0),s.height+(hz?0:l)),x=c.getContext('2d');x.drawImage(s,dx,dy);
+/* ===== 아크릴 칼선 자동 생성: 그림 외곽에서 mm 만큼 바깥으로 둥글게 확장(유클리드 거리) ===== */
+function edt(A,w,h){const I=1e20,f=new Float32Array(w*h),n=Math.max(w,h),d=new Float64Array(n),v=new Int32Array(n),z=new Float64Array(n+1);let any=0;
+for(let i=0;i<w*h;i++){if(A[i]>.5){f[i]=0;any=1}else f[i]=I}if(!any)return null;
+const one=(g,o,st,len)=>{let k=0;v[0]=0;z[0]=-I;z[1]=I;
+for(let q=1;q<len;q++){let p=v[k],t=((g[o+q*st]+q*q)-(g[o+p*st]+p*p))/(2*q-2*p);while(t<=z[k]){k--;p=v[k];t=((g[o+q*st]+q*q)-(g[o+p*st]+p*p))/(2*q-2*p)}k++;v[k]=q;z[k]=t;z[k+1]=I}
+k=0;for(let q=0;q<len;q++){while(z[k+1]<q)k++;const p=v[k];d[q]=(q-p)*(q-p)+g[o+p*st]}for(let q=0;q<len;q++)g[o+q*st]=d[q]};
+for(let x=0;x<w;x++)one(f,x,w,h);for(let y=0;y<h;y++)one(f,y*w,1,w);return f}
+function grow(s,mm,k){const r=mm*k;if(!(r>.05))return{c:s,pd:0};const pd=Math.ceil(r)+2,w=s.width+2*pd,h=s.height+2*pd,c=cv(w,h),x=c.getContext('2d');x.drawImage(s,pd,pd);
+const im=x.getImageData(0,0,w,h),p=im.data,A=new Float32Array(w*h);for(let i=0;i<w*h;i++)A[i]=p[i*4+3]/255;const D=edt(A,w,h);if(!D)return{c:s,pd:0};
+for(let i=0;i<w*h;i++){const a=A[i];if(a>=1)continue;const m=Math.min(1,Math.max(0,r+.5-Math.sqrt(D[i])));if(m>a){const j=i*4;if(a<.5){p[j]=p[j+1]=p[j+2]=255}p[j+3]=Math.round(m*255)}}
+x.putImageData(im,0,0);return{c,pd}}
+/* 파츠의 칼선 여유(mm): 파츠별 값(p.ol)이 있으면 그 값, 없으면(null) 전체 설정 */
+const olOf=p=>p.ol!=null?Math.max(0,+p.ol||0):($('acut').checked?Math.max(0,+$('acm').value||0):0);
+const pre=(p,s,o,fl)=>{const g=grow(s,olOf(p),s.width/p.w);return prep(g.c,p,o,fl,g.pd)};
+function prep(s,p,o,fl,pp){pp=pp||0;const T=p.tab,H=holeOf(p,o),hx=(s.width-2*pp)/p.w,hy=(s.height-2*pp)/p.h;let sd=T&&T.on?T.side||'b':'b';if(fl&&sd=='l')sd='r';else if(fl&&sd=='r')sd='l';const hz=sd=='l'||sd=='r',l=T&&T.on?Math.round(T.l*(hz?hx:hy)):0;if(!l&&!H.length)return s;const dx=sd=='l'?l:0,dy=sd=='t'?l:0,c=cv(s.width+(hz?l:0),s.height+(hz?0:l)),x=c.getContext('2d');x.drawImage(s,dx,dy);
 if(l){const tw=T.w*(hz?hy:hx),d=s.getContext('2d').getImageData(0,0,s.width,s.height).data;let x0=s.width,x1=0,y0=s.height,y1=0;for(let y=0;y<s.height;y++)for(let xx=0;xx<s.width;xx++)if(d[(y*s.width+xx)*4+3]>20){if(xx<x0)x0=xx;if(xx+1>x1)x1=xx+1;if(y<y0)y0=y;y1=y+1}let fo=T.off||0;if(fl&&!hz)fo=-fo;x.fillStyle='#ffffff';if(hz)x.fillRect(sd=='l'?x0:x1-1,s.height/2-fo*hy-tw/2,l+1,tw);else x.fillRect(s.width/2+fo*hx-tw/2,sd=='t'?y0:y1-1,tw,l+1)}
 for(const H1 of H){x.save();x.globalCompositeOperation='destination-out';x.translate(s.width/2+H1.x*hx+dx,s.height/2-H1.y*hy+dy);x.rotate(-H1.a*Math.PI/180);x.fillRect(-H1.w*hx/2,-H1.h*hy/2,H1.w*hx,H1.h*hy);x.restore()}return c}
 function wall(M,w,h,pw,ph,ox,oy,t){const W2=w+2,B=new Uint8Array(W2*(h+2));for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(M[y*w+x]>.5)B[(y+1)*W2+x+1]=1;
@@ -203,14 +235,14 @@ const vs=new Int32Array(w+1),vt=new Uint8Array(w+1);
 for(let j=0;j<=h;j++)for(let i=0;i<=w;i++){const a=j<h?S(i-1,j):0,b=j<h?S(i,j):0,c=a==b?0:a?1:2;if(c!=vt[i]){if(vt[i])quad(i,vs[i],i,j,vt[i]==1?1:-1,0,j-vs[i]<=LM);vs[i]=j;vt[i]=c}}
 const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));return g}
 function disp(g){g.traverse(o=>{if(o.geometry)o.geometry.dispose();const m=o.material;if(m){if(m.map)m.map.dispose();m.dispose()}})}
-function mk(p,o){const t=o.t,wf=p.wi==null||p.wi===''?o.wo:+p.wi,wb=p.wi2==null||p.wi2===''?o.wo:+p.wi2,tl=p.tab&&p.tab.on?p.tab.l:0,sd=p.tab&&p.tab.on?p.tab.side||'b':'b',ox=sd=='l'?-tl/2:sd=='r'?tl/2:0,oy=sd=='b'?-tl/2:sd=='t'?tl/2:0,Sf=prep(p.src,p,o),{pc,ec,w:cw,h:ch,M:MM}=proc(Sf,{...o,wo:wf,ol:p.ol}),pw=p.w*cw/p.src.width,ph=p.h*ch/p.src.height,g=new THREE.Group(),tx=new THREE.CanvasTexture(pc);
+function mk(p,o){const t=o.t,wf=p.wi==null||p.wi===''?o.wo:+p.wi,wb=p.wi2==null||p.wi2===''?o.wo:+p.wi2,tl=p.tab&&p.tab.on?p.tab.l:0,sd=p.tab&&p.tab.on?p.tab.side||'b':'b',ox=sd=='l'?-tl/2:sd=='r'?tl/2:0,oy=sd=='b'?-tl/2:sd=='t'?tl/2:0,Sf=pre(p,p.src,o),{pc,ec,w:cw,h:ch,M:MM}=proc(Sf,{...o,wo:wf}),pw=p.w*cw/p.src.width,ph=p.h*ch/p.src.height,g=new THREE.Group(),tx=new THREE.CanvasTexture(pc);
 tx.encoding=THREE.sRGBEncoding;tx.anisotropy=8;
 const pm=new THREE.MeshBasicMaterial({map:tx,transparent:true,alphaTest:.04,side:THREE.DoubleSide,depthWrite:wf>.9}),f=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph),pm);f.position.set(ox,oy,t/2+.02);g.add(f);p.m={M:MM,w:cw,h:ch,pw,ph,t,tl,ox,oy};
 p.fm=pm;
 const wm=new THREE.MeshStandardMaterial({color:new THREE.Color(o.edge).convertSRGBToLinear(),transparent:o.eo<1,opacity:o.eo,roughness:o.ro,side:THREE.DoubleSide,depthWrite:o.eo>.9}),wg=wall(MM,cw,ch,pw,ph,ox,oy,t);p.wm=wm;
 if(wg.attributes.position.count)g.add(new THREE.Mesh(wg,wm));
 if(o.eo<.99){const et=new THREE.CanvasTexture(ec);et.encoding=THREE.sRGBEncoding;const bm=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph),new THREE.MeshBasicMaterial({map:et,transparent:true,opacity:o.eo*.6,alphaTest:.02,side:THREE.DoubleSide,depthWrite:false}));bm.position.set(ox,oy,0);g.add(bm)}
-if(p.src2){const b=proc(prep(p.src2,p,o,1),{...o,wo:wb,ol:p.ol}),bt=new THREE.CanvasTexture(b.pc);bt.encoding=THREE.sRGBEncoding;bt.anisotropy=8;pm.side=THREE.FrontSide;
+if(p.src2){const b=proc(pre(p,p.src2,o,1),{...o,wo:wb}),bt=new THREE.CanvasTexture(b.pc);bt.encoding=THREE.sRGBEncoding;bt.anisotropy=8;pm.side=THREE.FrontSide;
 const bm=new THREE.Mesh(new THREE.PlaneGeometry(p.w*b.w/p.src2.width,p.h*b.h/p.src2.height),new THREE.MeshBasicMaterial({map:bt,transparent:true,alphaTest:.04,side:THREE.FrontSide,depthWrite:wb>.9}));bm.rotation.y=Math.PI;bm.position.set(ox,oy,-t/2-.02);g.add(bm)}return g}
 let chk=false;const sched=p=>{if(p&&p.pos)dirty.add(p);else dirtyAll=true;chk=true;need=true;cmS()},V3=new THREE.Vector3();
 function feat(p){const{M,w,h,pw,ph,ox,oy}=p.m,st=Math.max(1,h>>7),sx=Math.max(1,w>>7),X=i=>(i/w-.5)*pw+ox,Y=j=>(.5-j/h)*ph+oy;let a0=w,a1=0,b0=h,b1=0;const Lv=[],Rv=[],Tv=[],Bv=[];
@@ -249,17 +281,17 @@ const gopt=()=>{const pr=P[$('mat').value];return{wo:+$('wo').value,tint:pr[1],e
 function place(p){const k=kx();p.g.position.set(p.pos[0]*k,p.pos[1]*k,p.pos[2]*k);p.g.rotation.set(...p.rot.map(dg));need=true}
 function build(p){if(p.g){root.remove(p.g);disp(p.g)}p.g=mk(p,gopt());feat(p);p.g.userData.pid=p.id;root.add(p.g);place(p);p.g.visible=p.vis;if(sel===p)attach();sched(p)}
 function attach(){if(sel&&sel.vis&&+$('ex').value==0)tc.attach(sel.g);else tc.detach();need=true}
-const lbl=()=>{$('wov').textContent=(+$('wo').value).toFixed(2);$('rov').textContent=(+$('ro').value).toFixed(2);$('thv').textContent=$('th').value+'mm'};
+const lbl=()=>{$('wov').textContent=(+$('wo').value).toFixed(2);$('rov').textContent=(+$('ro').value).toFixed(2);$('thv').textContent=$('th').value+'mm';$('acv').textContent=(+$('acm').value).toFixed(1)+'mm'};
 const buildAll=()=>{parts.forEach(build);lbl()};
 let qs=new Set(),qa=false,qt=0;
 function qb(p){if(p)qs.add(p);else qa=true;if(!qt)qt=setTimeout(()=>{qt=0;const L=qa?parts.slice():[...qs];qa=false;qs.clear();L.forEach(q=>parts.includes(q)&&build(q));lbl()},90)}
 const FD=['w','h','px','py','pz','rx','ry','rz'];
-function sync(){const p=sel;if(p&&p.fill&&document.activeElement!==$('fc'))$('fc').value=p.fill;$('sn').textContent=p?p.name:'없음';if(document.activeElement!==$('nm'))$('nm').value=p?p.name:'';$('reg').textContent=p&&p.bb?'오브젝트 영역(스냅·겹침 기준): '+(p.bb.x1-p.bb.x0).toFixed(1)+' × '+(p.bb.y1-p.bb.y0).toFixed(1)+'mm':'';if(!p)return;const v=[p.w,p.h,...p.pos,...p.rot];FD.forEach((id,i)=>{if(document.activeElement!==$(id))$(id).value=+(+v[i]).toFixed(2)});$('ol').value=p.ol;$('olv').textContent=p.ol+'px';$('wi').value=p.wi==null?'':p.wi;$('wi2').value=p.wi2==null?'':p.wi2;const T=p.tab||{on:false,w:20,l:+$('th').value},H=(p.holes&&p.holes[p.hi||0])||{x:0,y:0,w:10,h:+$('th').value,a:0},tol=+$('tol').value||0,r=$('mt').checked&&parts.find(q=>q.tab&&q.tab.on),sv=(id,v)=>{if(document.activeElement!==$(id))$(id).value=v};
+function sync(){const p=sel;if(p&&p.fill&&document.activeElement!==$('fc'))$('fc').value=p.fill;$('sn').textContent=p?p.name:'없음';if(document.activeElement!==$('nm'))$('nm').value=p?p.name:'';$('reg').textContent=p&&p.bb?'오브젝트 영역(스냅·겹침 기준): '+(p.bb.x1-p.bb.x0).toFixed(1)+' × '+(p.bb.y1-p.bb.y0).toFixed(1)+'mm':'';if(!p)return;const v=[p.w,p.h,...p.pos,...p.rot];FD.forEach((id,i)=>{if(document.activeElement!==$(id))$(id).value=+(+v[i]).toFixed(2)});{const om=p.ol==null?'g':(+p.ol>0?'c':'n'),ev=p.ol==null?olOf(p):+p.ol;$('olm').value=om;$('ol').disabled=om!='c';if(document.activeElement!==$('ol'))$('ol').value=om=='c'?p.ol:Math.max(.1,ev);$('olv').textContent=ev.toFixed(1)+'mm'}$('wi').value=p.wi==null?'':p.wi;$('wi2').value=p.wi2==null?'':p.wi2;const T=p.tab||{on:false,w:20,l:+$('th').value},H=(p.holes&&p.holes[p.hi||0])||{x:0,y:0,w:10,h:+$('th').value,a:0},tol=+$('tol').value||0,r=$('mt').checked&&parts.find(q=>q.tab&&q.tab.on),sv=(id,v)=>{if(document.activeElement!==$(id))$(id).value=v};
 $('tabon').checked=T.on;sv('tw',T.w);sv('tl',T.l);$('tside').value=T.side||'b';sv('toff',T.off||0);$('holeon').checked=!!p.hon;sv('hx',H.x);sv('hy',H.y);sv('ha',H.a);$('hw').disabled=$('hh').disabled=!!r;sv('hw',r?+(r.tab.w+tol).toFixed(2):H.w);sv('hh',r?+(+$('th').value+tol).toFixed(2):H.h);$('hsel').innerHTML=(p.holes||[]).map((_,i)=>'<option value="'+i+'">구멍 '+(i+1)+'</option>').join('');$('hsel').value=p.hi||0}
 function list(){const L=$('pl');L.innerHTML='';parts.forEach(p=>{const d=document.createElement('div');d.className='pr';const c=document.createElement('input');c.type='checkbox';c.checked=p.vis;c.onchange=()=>{p.vis=c.checked;p.g.visible=p.vis;attach();chk=true};
 const b=document.createElement('button');b.textContent=(p.ov?'⚠ ':'')+p.name;b.className=p===sel?'on':'';b.onclick=()=>choose(p);d.append(c,b);L.appendChild(d)})}
 function choose(p){sel=p;attach();list();sync()}
-function addPart(name,src,w,pos,rot,ol){const p={id:++pid,name,src,w,h:w*src.height/src.width,pos,rot,ol:ol||0,vis:true};parts.push(p);build(p);return p}
+function addPart(name,src,w,pos,rot,ol){const p={id:++pid,name,src,w,h:w*src.height/src.width,pos,rot,ol:ol==null?null:ol,vis:true};parts.push(p);build(p);return p}
 function init(){parts.forEach(p=>{root.remove(p.g);disp(p.g)});parts=[];sel=null;tc.detach();
 /* 견본 프리셋: 앞뒤 62.1×43.9 / 좌우 31.2×49.7 / 상하 62.1×31.2mm, 두께 3mm. 앞판 창·모서리 홈·바닥 구멍·내부파츠 꽂는 부분 포함 */
 const K=12,mk=(w,h,fill,cut,rr,keep)=>{const c=cv(Math.round(w*K),Math.round(h*K)),x=c.getContext('2d');x.fillStyle=fill;
@@ -274,10 +306,10 @@ const SP=[
 ['right',E,F,[29.8227,0,0],[0,90,0],nt,lr],
 ['top',A,E,[0,23.3285,0],[-90,0,0],ss],
 ['bottom',A,E,[0,-23.3285,0],[90,0,0],ss]];
-SP.forEach(([k,w,h,pos,rot,cut,keep])=>{const p=addPart(NM[k],mk(w,h,SCOL[k],cut,0,keep),w,pos,rot);p.h=h;p.role=k;p.fill=SCOL[k];p.wi='1';p.wi2='1';
+SP.forEach(([k,w,h,pos,rot,cut,keep])=>{const p=addPart(NM[k],mk(w,h,SCOL[k],cut,0,keep),w,pos,rot);p.h=h;p.role=k;p.ol=0;p.fill=SCOL[k];p.wi='1';p.wi2='1';
 if(k=='bottom'){p.holes=[{x:-1.5,y:1.5,w:20.1,h:3.1,a:180},{x:13,y:-6.13,w:20.1,h:3.1,a:0}];p.hon=true;p.hi=0}build(p)});
 [['내부파츠 1',42.5027,49.5723,[3,-0.5,-6.1346],[0,0,270],{on:true,w:20,l:3,side:'r',off:10}],['내부파츠 2',25.4847,54.0597,[-1.5,-9,1.5],[0,0,90],{on:true,w:20,l:3,side:'l',off:0}]]
-.forEach(([n,w,h,pos,rot,tab])=>{const p=addPart(n,mk(w,h,SCOL.fig,null,4),w,pos,rot);p.h=h;p.fill=SCOL.fig;p.tab=tab;p.wi='1';p.wi2='1';build(p)});
+.forEach(([n,w,h,pos,rot,tab])=>{const p=addPart(n,mk(w,h,SCOL.fig,null,4),w,pos,rot);p.h=h;p.ol=0;p.fill=SCOL.fig;p.tab=tab;p.wi='1';p.wi2='1';build(p)});
 list();sync();ctl.target.set(0,0,0);cam.position.set(150,100,210);ctl.update();need=true}
 const SCOL={front:'#8fa3d6',back:'#d68f9b',left:'#8fd6b0',right:'#d6c98f',top:'#b08fd6',bottom:'#8fd0d6',fig:'#e08a5a'};
 /* 단색 칠하기: 이미지의 투명 영역(창·홈)은 그대로 두고 나머지를 한 가지 색으로 */
@@ -299,14 +331,15 @@ $('auto').onclick=()=>{if(!+$('ex').value)auto()};
 $('af').onchange=async e=>{const fs=[...e.target.files];e.target.value='';const G={},m=25.4/Math.max(30,+$('dpi').value||300);let last=null;
 for(const f of fs){const[c,n]=await new Promise(r=>load(f,(c,n)=>r([c,n]))),r=roleOf(n);
 if(r){const g=G[r]=G[r]||{};g[/내부|안쪽|inner/i.test(n)?'i':'o']=c;g.n=n.replace(/내부|외부|안쪽|바깥쪽/g,'').trim()||n}else last=addPart(n,c,c.width*m,[0,0,0],[0,0,0])}
-for(const r in G){const g=G[r],p=addPart(g.n,g.o||blank(g.i),(g.o||g.i).width*m,[0,0,0],[0,0,0]);p.role=r;if(g.i){p.src2=g.i;build(p)}last=p}
+for(const r in G){const g=G[r],p=addPart(g.n,g.o||blank(g.i),(g.o||g.i).width*m,[0,0,0],[0,0,0]);p.role=r;p.ol=0;if(g.i)p.src2=g.i;build(p);last=p}
 if(Object.keys(G).length)auto();if(last)choose(last)};
 FD.forEach(id=>$(id).oninput=()=>{const p=sel;if(!p||$(id).value==='')return;const v=+$(id).value;
 if(id=='w'){p.w=v;if($('lock').checked)p.h=v*p.src.height/p.src.width}else if(id=='h'){p.h=v;if($('lock').checked)p.w=v*p.src.width/p.src.height}
 else if(id[0]=='p')p.pos['xyz'.indexOf(id[1])]=v;else p.rot['xyz'.indexOf(id[1])]=v;
 if(id=='w'||id=='h'){qb(p);sync()}else{place(p);sched(p)}});
 ['x','y','z'].forEach((a,i)=>$(a+'9').onclick=()=>{if(!sel)return;sel.rot[i]=((sel.rot[i]+90)%360);place(sel);sync();sched()});
-$('ol').oninput=()=>{if(sel){sel.ol=+$('ol').value;qb(sel);sync()}};
+$('ol').oninput=()=>{if(sel&&$('olm').value=='c'){sel.ol=+$('ol').value;qb(sel);sync()}};
+$('olm').onchange=()=>{if(!sel)return;const m=$('olm').value,g=$('acut').checked&&+$('acm').value>0?+$('acm').value:2;sel.ol=m=='g'?null:m=='n'?0:(+sel.ol>0?+sel.ol:g);qb(sel);sync()};
 $('dup').onclick=()=>{if(sel){const n=addPart(sel.name+' 복사',sel.src,sel.w,[sel.pos[0]+10,sel.pos[1],sel.pos[2]],[...sel.rot],sel.ol);n.src2=sel.src2;n.wi=sel.wi;n.wi2=sel.wi2;n.tab=sel.tab&&{...sel.tab};n.holes=sel.holes&&sel.holes.map(h=>({...h}));n.hon=sel.hon;n.hi=0;build(n);choose(n)}};
 $('del').onclick=()=>{if(!sel)return;root.remove(sel.g);disp(sel.g);parts=parts.filter(p=>p!==sel);sel=null;tc.detach();list();sync();sched()};
 $('nm').oninput=()=>{if(sel){sel.name=$('nm').value;$('sn').textContent=sel.name;list()}};
@@ -320,7 +353,7 @@ $('hdel').onclick=()=>{if(!sel||!sel.holes||!sel.holes.length)return;sel.holes.s
 $('hsel').onchange=()=>{if(sel){sel.hi=+$('hsel').value;sync()}};
 const blobOf=c=>new Promise(r=>c.toBlob(r,'image/png')),fn=s=>(s||'part').replace(/[\\/:*?"<>|]/g,'_');
 async function save(name,data){if(!data){alert('저장할 데이터를 만들지 못했습니다.');return}const u=URL.createObjectURL(data),a=document.createElement('a');a.href=u;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000)}
-const expC=(p,o)=>{const q={...o,wo:1,ol:p.ol},n=fn(p.name);return[[n+'_앞',proc(prep(p.src,p,o),q).pc]].concat(p.src2?[[n+'_뒤',proc(prep(p.src2,p,o,1),q).pc]]:[])};
+const expC=(p,o)=>{const q={...o,wo:1},n=fn(p.name);return[[n+'_앞',proc(pre(p,p.src,o),q).pc]].concat(p.src2?[[n+'_뒤',proc(pre(p,p.src2,o,1),q).pc]]:[])};
 $('expp').onclick=async()=>{if(!sel)return;const fs=expC(sel,gopt());if(fs.length==1)save(fs[0][0]+'.png',await blobOf(fs[0][1]));else{const z=new JSZip();for(const[n,c]of fs)z.file(n+'.png',await blobOf(c));save(fn(sel.name)+'.zip',await z.generateAsync({type:'blob'}))}};
 $('expa').onclick=async()=>{const z=new JSZip();for(const p of parts)for(const[n,c]of expC(p,gopt()))z.file(n+'.png',await blobOf(c));save('acrylic-parts.zip',await z.generateAsync({type:'blob'}))};
 ['holeon','hx','hy','hw','hh','ha'].forEach(i=>$(i).oninput=holeU);
@@ -352,7 +385,7 @@ $('mv').onclick=()=>tc.setMode('translate');$('rt').onclick=()=>tc.setMode('rota
 $('ts').onchange=()=>tc.setTranslationSnap(+$('ts').value||null);$('rs').onchange=()=>tc.setRotationSnap(+$('rs').value?dg(+$('rs').value):null);
 $('ts').onchange();$('rs').onchange();$('sp').onchange=()=>tc.setSpace($('sp').value);
 $('mat').onchange=()=>{$('wo').value=P[$('mat').value][0];buildAll()};
-['wo','th','cut'].forEach(i=>$(i).addEventListener('input',()=>{lbl();qb()}));
+['wo','th','cut','acm','acut'].forEach(i=>$(i).addEventListener('input',()=>{lbl();qb();sync()}));
 $('ro').addEventListener('input',()=>{lbl();const r=+$('ro').value;parts.forEach(p=>{if(p.wm)p.wm.roughness=r});need=true});
 $('otol').addEventListener('input',()=>sched());
 $('ex').oninput=()=>{parts.forEach(place);attach();sched()};$('rst').onclick=()=>init();
@@ -399,11 +432,11 @@ $('fcrs').onclick=()=>{parts.forEach(p=>paint(p,SCOL[p.role]||SCOL.fig));sync();
 $('wo').value=P.clear[0];size();init();cur=snapS();
 
 /* ===== 프로젝트 저장 / 불러오기 / 자동 저장 ===== */
-const SET=['chk','trim','keyc','dpi','lock','mt','tol','ts','rs','sp','osn','osd','osc','otol','ex','mat','wo','ro','th','cut','bgon','bgc'];
+const SET=['chk','trim','keyc','dpi','lock','mt','tol','ts','rs','sp','osn','osd','osc','otol','ex','mat','wo','ro','th','cut','bgon','bgc','acut','acm'];
 const ICA=new WeakMap(),toURL=c=>{let u=ICA.get(c);if(!u){u=c.toDataURL('image/png');ICA.set(c,u)}return u};
 function pack(){const im=[],ix=new Map(),ref=c=>{if(!c)return null;if(!ix.has(c)){ix.set(c,im.length);im.push(toURL(c))}return ix.get(c)},st={};
 SET.forEach(id=>{const e=$(id);st[id]=e.type=='checkbox'?e.checked:e.value});
-return{app:'acrylic-mockup',ver:1,saved:new Date().toISOString(),settings:st,cam:{p:cam.position.toArray(),t:ctl.target.toArray()},sel:sel?sel.id:null,
+return{app:'acrylic-mockup',ver:2,saved:new Date().toISOString(),settings:st,cam:{p:cam.position.toArray(),t:ctl.target.toArray()},sel:sel?sel.id:null,
 parts:parts.map(p=>{const o={src:ref(p.src),src2:ref(p.src2),pos:[...p.pos],rot:[...p.rot],tab:p.tab||null,holes:p.holes||null};KEYS.forEach(k=>{if(p[k]!==undefined)o[k]=p[k]});return o}),images:im}}
 const dec=u=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>{const c=cv(i.width,i.height);c.getContext('2d').drawImage(i,0,0);ICA.set(c,u);res(c)};i.onerror=()=>rej(new Error('이미지를 읽을 수 없습니다'));i.src=u});
 const v3=a=>Array.isArray(a)&&a.length==3&&a.every(Number.isFinite);
@@ -412,8 +445,9 @@ if(!d||d.app!='acrylic-mockup'||!Array.isArray(d.parts)||!Array.isArray(d.images
 for(const o of d.parts)if(!v3(o.pos)||!v3(o.rot)||!(o.w>0)||!(o.h>0)||d.images[o.src]==null)throw new Error('파츠 정보가 올바르지 않습니다');
 const cs=await Promise.all(d.images.map(dec));
 for(const id of SET){if(!(id in d.settings))continue;const e=$(id),v=d.settings[id];if(e.type=='checkbox')e.checked=!!v;else e.value=v}
+const oldV=(d.ver||1)<2;if(oldV){$('acut').checked=false;$('acm').value=2}
 $('ts').onchange();$('rs').onchange();$('sp').onchange();applyBg();
-const used=new Set(),L=d.parts.map(o=>{const p={...o,src:cs[o.src],src2:o.src2==null?null:cs[o.src2]};if(!p.tab)delete p.tab;if(!p.holes)delete p.holes;if(!p.id||used.has(p.id))p.id=0;used.add(p.id);return p});
+const used=new Set(),L=d.parts.map(o=>{const p={...o,src:cs[o.src],src2:o.src2==null?null:cs[o.src2]};if(oldV){const px=+o.ol||0;p.ol=px>0?+(px*o.w/p.src.width).toFixed(2):null}if(!p.tab)delete p.tab;if(!p.holes)delete p.holes;if(!p.id||used.has(p.id))p.id=0;used.add(p.id);return p});
 pid=Math.max(0,...L.map(p=>p.id));L.forEach(p=>{if(!p.id)p.id=++pid});
 restore({L,th:$('th').value,sel:d.sel});
 if(d.cam&&v3(d.cam.p)&&v3(d.cam.t)){cam.position.fromArray(d.cam.p);ctl.target.fromArray(d.cam.t);ctl.update()}
@@ -435,4 +469,63 @@ try{restoring=true;await apply(JSON.parse(await f.text()));flash('프로젝트�
 ['pointerdown','pointerup','input','change','click','keydown'].forEach(n=>document.addEventListener(n,rq,true));ctl.addEventListener('change',rq);tc.addEventListener('change',rq);
 let lastOv=0;(function loop(){requestAnimationFrame(loop);if(chk){const n=performance.now();if(!tc.dragging||n-lastOv>150){chk=false;lastOv=n;overlap()}}
 const mv=ctl.update();if(mv||need){need=false;ren.render(sc,cam)}})();
+
+/* ===== 옵션별 도움말(?) 버튼: 눌러서 해당 설명을 팝업으로 보기 ===== */
+(()=>{
+const side=document.querySelector('aside'),pop=document.createElement('div');
+pop.id='hpop';pop.hidden=true;
+pop.innerHTML='<div class="ph"><b></b><button type="button" class="px" aria-label="닫기">✕</button></div><div class="pb"></div><div class="pf"><button type="button" class="pm">📖 설명서에서 전체 보기</button></div>';
+document.body.appendChild(pop);
+const pt=pop.querySelector('.ph b'),pb=pop.querySelector('.pb');let cb=null,ci=-1;
+const find=k=>ars.findIndex(a=>a.dataset.t.includes(k));
+function close(){pop.hidden=true;if(cb)cb.classList.remove('on');cb=null;ci=-1}
+function place(){const r=cb.getBoundingClientRect(),ar=side.getBoundingClientRect();pop.style.maxHeight='';
+if(innerWidth<=760){pop.style.left='12px';pop.style.top='8px';pop.style.maxHeight=Math.max(140,ar.top-16)+'px';return}
+const w=pop.offsetWidth,h=pop.offsetHeight;let x=ar.left-w-10;if(x<8)x=8;let y=Math.min(r.top-14,innerHeight-h-8);if(y<8)y=8;pop.style.left=x+'px';pop.style.top=y+'px'}
+function show(b,i){if(cb)cb.classList.remove('on');const a=ars[i],c=a.cloneNode(true);c.querySelectorAll('.bc,h3').forEach(x=>x.remove());
+pt.textContent=a.dataset.t;pb.replaceChildren(...c.childNodes);pop.hidden=false;pb.scrollTop=0;cb=b;ci=i;b.classList.add('on');place()}
+function mk(k){const i=find(k);if(i<0){console.warn('help: 설명 항목 없음',k);return null}
+const b=document.createElement('button');b.type='button';b.className='hb';b.textContent='?';b.title='설명 보기';b.setAttribute('aria-label',ars[i].dataset.t+' 설명 보기');
+b.onclick=e=>{e.preventDefault();cb===b?close():show(b,i)};return b}
+/* 라벨: 제목 글자 바로 뒤에 ? 를 붙임 */
+function L(id,k){const l=$(id).closest('label'),b=mk(k);if(!b)return;l.classList.add('hl');let t=l.firstChild;
+if(t.nodeType==3){const s=document.createElement('span');s.textContent=t.textContent;l.replaceChild(s,t);t=s}t.after(b)}
+/* 버튼/입력칸/묶음: 옆에 ? 를 붙이기 위해 한 줄로 감쌈 */
+function W(el,k){const b=mk(k);if(!b||!el)return;const w=document.createElement('div');w.className='hr'+(el.classList.contains('w')?' wm':'');el.before(w);w.append(el,b)}
+/* 작은 안내 글자 / 제목 뒤에 붙임 */
+function T(tag,p,k){const e=[...side.querySelectorAll(tag)].find(x=>x.textContent.trim().startsWith(p)),b=mk(k);if(e&&b)e.append(b)}
+const G=id=>$(id).parentElement;
+T('h1','아크릴','처음 시작하기');
+/* 보기 */
+T('small','시점','앞 · 뒤 · 좌');W(side.querySelector('[data-view=iso]'),'기본 시점');
+L('bgon','배경색 깔기');L('ex','분해');L('cut','칼선 표시');W($('shot'),'현재 화면 저장');
+/* 파츠 */
+T('h2','파츠 (','파츠 목록');W($('add'),'이미지로 파츠 추가');W($('rst'),'기본 배치로');W($('auto'),'자동 조립');
+L('dpi','이미지 해상도');
+{const l=$('trim').closest('label');l.classList.add('hl');$('trim').parentElement.after(mk('여백 자동 제거'));$('keyc').parentElement.after(mk('여백 자동 제거'))}
+/* 선택한 파츠 */
+W($('nm'),'파츠 이름');W(G('mv'),'이동 · 회전');W($('rep'),'앞면 이미지 교체');W($('repb'),'뒷면 이미지 넣기');W($('bdel'),'뒷면 이미지 넣기');
+L('fc','단색 면 색상');W(G('fcall'),'단색 면 색상');
+T('small','크기(mm)','크기 · 비율');L('lock','크기 · 비율');
+T('small','위치(mm)','위치 · 회전 · X/Y/Z');T('small','회전(°)','위치 · 회전 · X/Y/Z');
+L('wi','흰 잉크');L('wi2','흰 잉크');L('olm','칼선 여유');L('acut','칼선 자동 생성');L('acm','칼선 자동 생성');W(G('dup'),'복제 · 삭제');
+/* 스탠드 꽂는 부분 */
+L('tabon','꽂는 부분 만들기');T('small','폭 / 길이','폭 · 길이');L('tside','폭 · 길이');L('toff','폭 · 길이');W($('hauto'),'구멍 자동 생성');
+/* 구멍 */
+L('holeon','구멍 뚫기');W(G('hsel'),'구멍 뚫기');T('small','위치 X / Y','구멍 위치');T('small','크기 가로','구멍 위치');L('ha','구멍 위치');L('mt','구멍 = 꽂는');
+/* 맞춤 도구 */
+L('ts','이동 스냅');L('rs','이동 스냅');L('sp','핸들 기준');L('osn','파츠 스냅');L('osd','파츠 스냅');L('osc','파츠 스냅');L('otol','겹침 검사');L('chk','겹침 검사');W($('snap'),'겹침 해소');
+/* 재질 */
+L('mat','종류');L('wo','바탕 불투명도');L('ro','바탕 불투명도');L('th','아크릴 두께');
+/* 저장 */
+W($('expp'),'선택 파츠 저장');W($('expa'),'선택 파츠 저장');W(G('psave'),'프로젝트 저장');L('asv','자동 저장');
+/* 팝업 동작 */
+pop.querySelector('.px').onclick=close;
+pop.querySelector('.pm').onclick=()=>{const i=ci;close();showMan(i);hp.hidden=false};
+document.addEventListener('pointerdown',e=>{if(pop.hidden)return;const t=e.target;if(pop.contains(t)||(t.closest&&t.closest('.hb')))return;close()},true);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!pop.hidden)close()});
+addEventListener('resize',()=>{if(!pop.hidden)place()});
+side.addEventListener('scroll',()=>{if(pop.hidden||!cb)return;const r=cb.getBoundingClientRect(),a=side.getBoundingClientRect();if(r.bottom<a.top||r.top>a.bottom)close();else place()});
+$('help').addEventListener('click',close);
+})();
 </script></body></html>
