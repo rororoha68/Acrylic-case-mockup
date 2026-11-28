@@ -29,13 +29,8 @@ input[type=color]{width:40px;height:26px;padding:0;border:1px solid var(--ln);bo
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:4px 0}.g4 button{padding:4px 2px;font-size:12px}
 @media (max-width:760px){body{flex-direction:column}aside{width:auto;height:50%;border-left:0;border-top:1px solid var(--ln)}.mw{flex-direction:column}#mnav{width:auto;max-height:34%;border-right:0;border-bottom:1px solid var(--ln)}}
 
-/* ===== 아크릴판 배치 ===== */
-#lay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:55;padding:12px}#lay[hidden]{display:none}
-.mb.lb{width:min(1280px,100%);height:min(94vh,900px)}
-.lt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:7px 14px;border-bottom:1px solid var(--ln)}
-.lt label{margin:0;gap:6px}.lt input[type=number]{width:64px}.lt #shn{color:var(--tx);font-weight:600;min-width:150px}
-#lc{flex:1;min-height:0;position:relative;background:var(--bg)}#lcv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
-#lst{padding:6px 14px;border-top:1px solid var(--ln);color:var(--mu);font-size:12px}#lst .bad{color:#e0476a;font-weight:600}
+/* ===== 아크릴판 배치 (새 창이 막히면 쓰는 겹침 창) ===== */
+#lay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;z-index:55;padding:12px}#lay[hidden]{display:none}#lfr{flex:1;width:100%;height:100%;border:0;border-radius:12px;background:var(--pn)}
 /* ===== 옵션별 도움말(?) 버튼 + 팝업 ===== */
 .hb{display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;padding:0;margin:0;border-radius:50%;font-size:12px;font-weight:700;line-height:1;color:var(--ac);background:var(--bg);border:1px solid var(--ac);vertical-align:middle}
 .hb:hover,.hb.on{background:var(--ac);color:var(--pn)}
@@ -122,7 +117,7 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <small>그림 외곽에서 바깥쪽으로 이 간격(mm)만큼 띄워 칼선을 만들고, 그 사이는 투명 영역으로 둡니다(그림 없이 투명 아크릴). 파츠를 선택하면 「칼선 여유 (이 파츠)」에서 파츠별로 따로 정할 수 있습니다.</small>
 <h2>아크릴판 배치</h2>
 <button class="w" id="layo">🧩 아크릴판에 파츠 배치하기</button>
-<small>판 크기를 정하고 파츠를 실제 크기 그대로 놓습니다. 자동 배치는 파츠 간격 3mm 이상.</small>
+<small>새 창에서 판 크기를 정하고 파츠를 실제 크기 그대로 배치한 뒤 PNG로 내보냅니다. 자동 배치는 파츠 간격 3mm 이상.</small>
 <h2>저장</h2>
 <button class="w" id="expp">선택 파츠 저장 (구멍·꽂는 부분 포함)</button>
 <button class="w" id="expa">전체 파츠 저장 (zip)</button>
@@ -171,13 +166,36 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <article data-g="재질" data-t="인쇄 외 바탕 불투명도 · 광택"><ul><li><b>바탕 불투명도</b>: 흰색에 가까운 부분이 얼마나 비칠지 정합니다.</li><li><b>광택</b>: 낮을수록 반짝입니다.</li></ul></article>
 <article data-g="재질" data-t="아크릴 두께"><p>1~10mm. 전체 판에 공통으로 적용되고 판 단면이 두께만큼 보입니다. 두께를 바꿔도 판 위치는 자동으로 다시 계산되지 않으니 직접 맞추거나 초기화하세요.</p></article>
 <article data-g="칼선" data-t="칼선 자동 생성 · 기본 여유(mm)"><p>그림의 외곽선에서 바깥쪽으로 일정 간격(mm)을 띄운 둥근 칼선을 자동으로 만듭니다. 칼선 안쪽 빈 곳은 투명 영역으로 남습니다(저장 PNG에서도 투명).</p><ul><li><b>칼선 자동 생성</b>: 「전체 설정 따름」인 파츠에 칼선을 만들지 켜고 끕니다.</li><li><b>기본 칼선 여유(mm)</b>: 기본값은 2mm이고 0~10mm 사이에서 0.1mm 단위로 조절합니다.</li><li>파츠별로 다르게 하려면 파츠를 선택하고 「칼선 여유 (이 파츠)」를 바꾸세요.</li><li>칼선은 「보기」의 <b>칼선 표시</b>를 켜면 분홍색 선으로 보이고, 파츠 저장 PNG에도 같은 모양으로 반영됩니다.</li></ul></article>
-<article data-g="배치" data-t="아크릴판 배치"><p>아크릴판 한 장 위에 모든 파츠를 <b>실제 크기 그대로</b> 놓아 보는 화면입니다. 확대·축소는 보기만 바뀔 뿐 파츠 크기는 변하지 않습니다.</p><ul><li><b>판 크기(mm)</b>: 가로×세로를 직접 입력하거나 목록에서 고릅니다. <b>가장자리 여백</b> 안쪽(점선)에만 놓는 것이 기준입니다.</li><li><b>자동 배치</b>: 파츠 사이를 <b>간격(최소 3mm)</b> 이상 띄워 빈틈없이 채워 놓습니다. 「90° 회전 허용」을 켜면 더 촘촘히 놓을 수 있습니다. 파츠는 사각형 영역(꽂는 부분 포함) 기준으로 배치됩니다. 판이 작아 못 들어간 파츠는 판 오른쪽 밖에 둡니다.</li><li><b>마음대로 옮기기</b>: 파츠를 끌어서 옮기고, 선택 후 X/Y(mm)를 입력하거나 방향키(Shift 5mm · Alt 0.1mm)로 미세 이동합니다. <b>R</b> 또는 「90° 회전」으로 돌립니다.</li><li><b>간격만큼 자석 붙이기</b>: 끄는 동안 다른 파츠·판 가장자리에 간격(3mm)을 두고 붙습니다(Alt를 누르면 일시 해제).</li><li>간격이 3mm보다 좁거나 겹치거나 여백 밖인 파츠는 붉은 테두리로 표시되고, 아래 안내줄에 개수가 나옵니다. 손으로 옮길 때는 막지 않고 경고만 합니다.</li><li>빈 곳을 끌면 화면 이동, 스크롤하면 확대·축소, <b>Ctrl+Z</b>로 배치를 되돌립니다.</li><li><b>배치 PNG 저장</b>: 판 크기 그대로(지정 DPI) 투명 배경 PNG로 저장합니다. 「칼선 표시」가 켜져 있으면 칼선도 그려집니다. 앞면 이미지 기준입니다.</li><li>배치는 프로젝트 저장·자동 저장에 함께 기록됩니다.</li></ul></article>
+<article data-g="배치" data-t="아크릴판 배치"><p>아크릴판 한 장 위에 모든 파츠를 <b>실제 크기 그대로</b> 놓아 보고 내보내는 화면입니다. 「🧩 아크릴판에 파츠 배치하기」를 누르면 <b>새 창</b>이 열립니다(브라우저가 팝업을 막으면 현재 화면 위에 겹쳐서 열립니다). 확대·축소는 보기만 바뀔 뿐 파츠 크기는 변하지 않습니다.</p><ul><li><b>판 크기(mm)</b>: 가로×세로를 직접 입력하거나 목록에서 고릅니다. <b>가장자리 여백</b> 안쪽(점선)에만 놓는 것이 기준입니다.</li><li><b>자동 배치</b>: 파츠 사이를 <b>간격(최소 3mm)</b> 이상 띄워 빈틈없이 채워 놓습니다. 「90° 회전 허용」을 켜면 더 촘촘히 놓을 수 있습니다. 파츠는 사각형 영역(꽂는 부분 포함) 기준으로 배치됩니다. 판이 작아 못 들어간 파츠는 판 오른쪽 밖에 둡니다. 처음 열 때는 자동으로 한 번 배치됩니다.</li><li><b>마음대로 옮기기</b>: 파츠를 끌어서 옮기고, 선택 후 X/Y(mm)를 입력하거나 방향키(Shift 5mm · Alt 0.1mm)로 미세 이동합니다. <b>R</b> 또는 「90° 회전」으로 돌립니다.</li><li><b>간격만큼 자석 붙이기</b>: 끄는 동안 다른 파츠·판 가장자리에 간격을 두고 붙습니다(Alt를 누르면 일시 해제).</li><li>간격이 모자라거나 겹치거나 여백 밖인 파츠는 붉은 테두리로 표시되고, 아래 안내줄에 개수가 나옵니다. 손으로 옮길 때는 막지 않고 경고만 합니다.</li><li>빈 곳을 끌면 화면 이동, 스크롤(또는 두 손가락)로 확대·축소, <b>Ctrl+Z / Ctrl+Y</b>로 배치를 되돌리거나 다시 합니다.</li><li><b>배치 PNG 내보내기</b>: 판 크기 그대로(지정 DPI) 투명 배경 PNG로 저장합니다. 파일에 DPI 정보가 들어 있어 일러스트레이터·포토샵 등에서 실제 크기(mm)로 열립니다. 「칼선 표시」가 켜져 있으면 칼선도 그려집니다. 앞면 이미지 기준이며, 판 밖에 있는 파츠는 저장되지 않습니다.</li><li><b>메인 변경 반영</b>: 배치 창을 연 채 메인 창에서 파츠를 고쳤다면 이 버튼으로 새 모양을 불러옵니다. 이미 놓은 위치는 유지되고 새 파츠만 빈 곳에 놓입니다.</li><li><b>📄 참고용 PDF</b>: 1쪽 안내문 → 판 배치(아트워크) → 파츠별 페이지 순서로 한 파일에 담아 저장합니다. <b>칼선 여유가 지정된 파츠</b>는 아트워크 페이지 바로 다음 장에 <b>벡터 칼선 페이지</b>가 따로 붙고, 칼선이 하나라도 있으면 판 배치 칼선 페이지도 들어갑니다. 모든 페이지는 실제 크기(1:1)입니다. <b>참고용 파일이므로 일러스트레이터 등에서 열어 수정한 뒤 사용하세요</b>(아트워크는 비트맵, 칼선만 벡터이며 안내문·페이지 제목은 이미지입니다).</li><li>배치는 프로젝트 저장·자동 저장에 함께 기록됩니다.</li></ul></article>
 <article data-g="저장" data-t="선택 파츠 저장 · 전체 파츠 저장"><ul><li><b>선택 파츠 저장</b>: 구멍·꽂는 부분이 반영된 판을 투명 배경 PNG로 저장합니다(뒷면이 있으면 앞·뒤 두 장을 zip으로).</li><li><b>전체 파츠 저장(zip)</b>: 모든 판을 zip 하나로 묶습니다.</li><li>칼선 표시가 켜져 있으면 칼선도 함께 그려집니다.</li></ul></article>
 <article data-g="저장" data-t="프로젝트 저장 · 불러오기"><p>모든 파츠(이미지 포함)·위치·회전·구멍·꽂는 부분·재질·배경색 등을 .json 파일 하나로 저장합니다. 외부 백업이므로 클라우드·USB 등에 보관하세요. <b>불러오기</b>로 그대로 복원됩니다.</p></article>
 <article data-g="저장" data-t="자동 저장"><p>켜져 있으면 작업이 바뀔 때마다 이 브라우저(IndexedDB)에 저장되고, 다시 열면 자동 복원됩니다. 브라우저 데이터를 지우거나 다른 기기·브라우저에서는 복원되지 않으니 중요한 작업은 .json으로도 저장하세요.</p></article>
 <article data-g="참고" data-t="알아두세요"><ul><li>이 화면은 미리보기용 근사치입니다. 최종 제작 전에는 실제 도면으로 다시 확인하세요.</li><li>저장할 때 확인창이 뜨며 허용해야 파일이 저장됩니다.</li><li>이 설명서는 처음 방문할 때 한 번 자동으로 열리고, 사이드 패널 맨 위 「사용 설명서」로 언제든 다시 열 수 있습니다.</li></ul></article>
 </div></div></div></div>
-<div id="lay" hidden><div class="mb lb"><div class="mh"><h1>아크릴판 배치</h1><button id="lxb">✕ 닫기</button></div>
+<div id="lay" hidden><iframe id="lfr" title="아크릴판 배치"></iframe></div>
+<script type="text/plain" id="lay-css">:root{--bg:#f1f3f7;--pn:#fff;--tx:#252b3b;--mu:#6b7488;--ln:#d5dae5;--ac:#4b5a8f;--bad:#e0476a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171e;--pn:#1e212b;--tx:#e6e9f2;--mu:#9099b0;--ln:#31364a;--ac:#8d9bd6}}
+:root[data-theme="dark"]{--bg:#15171e;--pn:#1e212b;--tx:#e6e9f2;--mu:#9099b0;--ln:#31364a;--ac:#8d9bd6}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;background:var(--pn);color:var(--tx);font:13px/1.5 "Noto Sans KR",system-ui,sans-serif}
+.top{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--ln)}
+.top h1{font-size:16px;margin:0;flex:1}
+label{display:flex;align-items:center;gap:6px;color:var(--mu);margin:0}
+select,button,input[type=number]{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:4px 7px}
+button{cursor:pointer}button:hover:not(:disabled){border-color:var(--ac)}button:disabled{opacity:.4;cursor:default}
+button.pri{background:var(--ac);color:var(--pn);border-color:var(--ac);font-weight:600}
+input[type=number]{width:64px}input[type=checkbox]{accent-color:var(--ac)}
+.lt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:7px 14px;border-bottom:1px solid var(--ln)}
+#shn{color:var(--tx);font-weight:600;min-width:170px}
+#lc{flex:1;min-height:0;position:relative;background:var(--bg)}
+#lcv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+#lst{padding:6px 14px;border-top:1px solid var(--ln);color:var(--mu);font-size:12px;min-height:18px}
+#lst .bad{color:var(--bad);font-weight:600}#lst .ok{color:#2f9e6b;font-weight:600}#lst .msg{color:var(--ac);font-weight:600}
+</script>
+<script type="text/plain" id="lay-body"><div class="top"><h1>🧩 아크릴판 배치</h1>
+<button id="lund" title="Ctrl+Z">↩ 되돌리기</button><button id="lred" title="Ctrl+Y">↪ 다시</button>
+<button id="lref" title="메인 창에서 파츠를 고친 뒤 눌러 반영합니다 (배치 위치는 유지)">🔄 메인 변경 반영</button>
+<button id="lcl">✕ 닫기</button></div>
 <div class="lt">
 <label>판 크기(mm)<input type="number" id="shw" value="300" min="10" step="10"> ×<input type="number" id="shh" value="200" min="10" step="10"></label>
 <label><select id="shp"><option value="">직접 입력</option><option value="300x200">300×200</option><option value="400x300">400×300</option><option value="600x400">600×400</option><option value="900x600">900×600</option></select></label>
@@ -189,13 +207,309 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <div class="lt">
 <span id="shn">파츠를 클릭해 선택</span>
 <label>X<input type="number" id="shx" step=".5"></label><label>Y<input type="number" id="shy" step=".5"></label>
-<button id="shrot">↻ 90° 회전</button>
+<button id="shrot" title="R">↻ 90° 회전</button>
 <label><input type="checkbox" id="shs" checked> 간격만큼 자석 붙이기</label>
 <label><input type="checkbox" id="shc" checked> 칼선 표시</label>
 <button id="shfit">화면 맞춤</button><button id="sh100">실제 크기(100%)</button>
-<label>DPI<input type="number" id="shdpi" value="300" min="30" max="1200"></label><button id="shsave">배치 PNG 저장</button>
+<label>DPI<input type="number" id="shdpi" value="300" min="30" max="1200"></label><button id="shsave" class="pri">⬇ 배치 PNG 내보내기</button><button id="shpdf" title="파츠별 페이지 + 칼선(벡터) 페이지. 참고용이며 일러스트레이터 등에서 수정해서 사용합니다">📄 참고용 PDF</button>
 </div>
-<div id="lc"><canvas id="lcv"></canvas></div><div id="lst"></div></div></div>
+<div id="lc"><canvas id="lcv"></canvas></div><div id="lst"></div>
+</script>
+<script type="text/plain" id="lay-js">(()=>{
+'use strict';
+const $=i=>document.getElementById(i),host=window.opener||(window.parent!==window?window.parent:null);
+const post=m=>{try{host&&host.postMessage(Object.assign({app:'acr-layout'},m),'*')}catch(e){}};
+const E=1e-6,clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),num=(v,d)=>{if(v===''||v==null)return d;v=+v;return Number.isFinite(v)?v:d};
+let parts=[],byId={},it={},zo=[],sel=null,hov=null,S={W:300,H:200,g:3,m:3,r:false,c:true,d:300},U=[],Rd=[],inited=false,msg='',msgT=0,nudgeT=0,inU=false;
+const cv=$('lcv'),cx=cv.getContext('2d'),lc=$('lc');
+let VS=3,VX=30,VY=30,dpr=1,need=true;
+const dim=p=>it[p.id].r%2?[p.h,p.w]:[p.w,p.h];
+const rect=p=>{const q=it[p.id],d=dim(p);return{x:q.x,y:q.y,w:d[0],h:d[1]}};
+const snap=()=>JSON.stringify(it);
+function pushU(s){U.push(s||snap());if(U.length>100)U.shift();Rd.length=0}
+function undo(){if(!U.length)return;Rd.push(snap());it=JSON.parse(U.pop());changed()}
+function redo(){if(!Rd.length)return;U.push(snap());it=JSON.parse(Rd.pop());changed()}
+function setMsg(t){msg=t;clearTimeout(msgT);msgT=setTimeout(()=>{msg='';ui()},8000);ui()}
+/* ---- 문제 검사: 간격 부족/겹침/여백 밖 ---- */
+function problems(){const bad=new Set(),R=parts.filter(p=>it[p.id]).map(p=>[p,rect(p)]),eps=1e-3;let out=0,pairs=0;
+ for(const[p,a]of R){if(a.x<S.m-eps||a.y<S.m-eps||a.x+a.w>S.W-S.m+eps||a.y+a.h>S.H-S.m+eps){bad.add(p.id);out++}}
+ for(let i=0;i<R.length;i++)for(let j=i+1;j<R.length;j++){const a=R[i][1],b=R[j][1];
+  if(a.x<b.x+b.w+S.g-eps&&b.x<a.x+a.w+S.g-eps&&a.y<b.y+b.h+S.g-eps&&b.y<a.y+a.h+S.g-eps){bad.add(R[i][0].id);bad.add(R[j][0].id);pairs++}}
+ return{bad,out,pairs}}
+function ui(){const pr=problems(),q=sel&&it[sel.id];
+ $('shn').textContent=sel?sel.name+' · '+dim(sel).map(v=>v.toFixed(1)).join('×')+'mm':'파츠를 클릭해 선택';
+ if(q){if(document.activeElement!==$('shx'))$('shx').value=+q.x.toFixed(2);if(document.activeElement!==$('shy'))$('shy').value=+q.y.toFixed(2)}
+ else{$('shx').value='';$('shy').value=''}
+ $('shx').disabled=$('shy').disabled=$('shrot').disabled=!sel;
+ $('lund').disabled=!U.length;$('lred').disabled=!Rd.length;
+ let h='판 '+(+S.W.toFixed(1))+'×'+(+S.H.toFixed(1))+'mm · 파츠 '+parts.length+'개 · ';
+ if(pr.pairs||pr.out)h+='<span class="bad">⚠ '+(pr.pairs?'간격 부족·겹침 '+pr.pairs+'쌍':'')+(pr.pairs&&pr.out?' · ':'')+(pr.out?'여백·판 밖 '+pr.out+'개':'')+'</span>';
+ else h+='<span class="ok">✓ 모든 파츠 정상</span>';
+ if(msg)h+=' &nbsp;·&nbsp; <span class="msg">'+msg+'</span>';
+ $('lst').innerHTML=h;need=true}
+let nt=0;
+const payload=()=>({W:S.W,H:S.H,g:S.g,m:S.m,r:S.r,c:S.c,d:S.d,items:it});
+function notify(){clearTimeout(nt);nt=setTimeout(()=>post({type:'layout',layout:payload()}),250)}
+function changed(){ui();notify()}
+/* ---- 자동 배치: MaxRects (여러 정렬·점수 조합 중 최선) ---- */
+function packRun(R,BW,BH,rot,obst,mode){let F=[{x:0,y:0,w:BW,h:BH}];
+ const same=(a,b)=>Math.abs(a.x-b.x)<E&&Math.abs(a.y-b.y)<E&&Math.abs(a.w-b.w)<E&&Math.abs(a.h-b.h)<E;
+ const cut=P=>{const N=[];for(const f of F){
+  if(P.x>=f.x+f.w-E||P.x+P.w<=f.x+E||P.y>=f.y+f.h-E||P.y+P.h<=f.y+E){N.push(f);continue}
+  if(P.x>f.x+E)N.push({x:f.x,y:f.y,w:P.x-f.x,h:f.h});
+  if(P.x+P.w<f.x+f.w-E)N.push({x:P.x+P.w,y:f.y,w:f.x+f.w-P.x-P.w,h:f.h});
+  if(P.y>f.y+E)N.push({x:f.x,y:f.y,w:f.w,h:P.y-f.y});
+  if(P.y+P.h<f.y+f.h-E)N.push({x:f.x,y:P.y+P.h,w:f.w,h:f.y+f.h-P.y-P.h})}
+  F=N.filter((a,i)=>!N.some((b,j)=>j!=i&&b.x<=a.x+E&&b.y<=a.y+E&&b.x+b.w>=a.x+a.w-E&&b.y+b.h>=a.y+a.h-E&&(!same(a,b)||j<i)))};
+ obst.forEach(cut);
+ const pos={},fail=[];let ux=0,uy=0;
+ for(const r of R){let best=null;
+  for(const f of F)for(const o of rot?[0,1]:[0]){const w=o?r.h:r.w,h=o?r.w:r.h;if(w>f.w+E||h>f.h+E)continue;
+   const dw=f.w-w,dh=f.h-h,s1=mode==0?Math.min(dw,dh):mode==1?f.w*f.h-w*h:f.y+h,s2=mode==0?Math.max(dw,dh):mode==1?Math.min(dw,dh):f.x;
+   if(!best||s1<best.s1-E||(Math.abs(s1-best.s1)<=E&&s2<best.s2-E))best={x:f.x,y:f.y,w,h,o,s1,s2}}
+  if(!best){fail.push(r.id);continue}
+  pos[r.id]={x:best.x,y:best.y,r:best.o};ux=Math.max(ux,best.x+best.w);uy=Math.max(uy,best.y+best.h);cut(best)}
+ return{pos,fail,score:ux*uy}}
+function auto(only){if(!parts.length)return 0;
+ const g=S.g,m=S.m,BW=S.W-2*m+g,BH=S.H-2*m+g,mv=only||parts,fixed=only?parts.filter(p=>!only.includes(p)&&it[p.id]):[];
+ const obst=fixed.map(p=>{const r=rect(p);return{x:r.x-m,y:r.y-m,w:r.w+g,h:r.h+g}}),base=mv.map(p=>({id:p.id,w:p.w+g,h:p.h+g}));
+ const sorts=[(a,b)=>b.w*b.h-a.w*a.h,(a,b)=>Math.max(b.w,b.h)-Math.max(a.w,a.h),(a,b)=>b.h-a.h||b.w-a.w,(a,b)=>b.w-a.w||b.h-a.h];
+ let best=null;
+ for(const so of sorts)for(let md=0;md<3;md++){const r=packRun(base.slice().sort(so),BW,BH,S.r,obst,md);
+  if(!best||r.fail.length<best.fail.length||(r.fail.length==best.fail.length&&r.score<best.score))best=r}
+ for(const id in best.pos){const q=best.pos[id];it[id]={x:m+q.x,y:m+q.y,r:q.r}}
+ let cy=m,cxx=S.W+15,cw=0;
+ for(const id of best.fail){const p=byId[id];if(cy+p.h>S.H&&cy>m){cy=m;cxx+=cw+10;cw=0}it[id]={x:cxx,y:cy,r:0};cy+=p.h+10;cw=Math.max(cw,p.w)}
+ return best.fail.length}
+/* ---- 보기 ---- */
+function zoomAt(mx,my,ns){ns=clamp(ns,.1,80);VX=mx-(mx-VX)*ns/VS;VY=my-(my-VY)*ns/VS;VS=ns;need=true}
+function fit(){const r=lc.getBoundingClientRect();let x0=0,y0=0,x1=S.W,y1=S.H;
+ for(const p of parts){if(!it[p.id])continue;const a=rect(p);x0=Math.min(x0,a.x);y0=Math.min(y0,a.y);x1=Math.max(x1,a.x+a.w);y1=Math.max(y1,a.y+a.h)}
+ const pad=30,w=x1-x0,h=y1-y0;VS=clamp(Math.min((r.width-2*pad)/w,(r.height-2*pad)/h),.1,80);VX=(r.width-w*VS)/2-x0*VS;VY=(r.height-h*VS)/2-y0*VS;need=true}
+function actual(){const r=lc.getBoundingClientRect(),c=sel&&it[sel.id]?rect(sel):{x:0,y:0,w:S.W,h:S.H},mx=c.x+c.w/2,my=c.y+c.h/2;VS=96/25.4;VX=r.width/2-mx*VS;VY=r.height/2-my*VS;need=true}
+function resize(){const r=lc.getBoundingClientRect();dpr=Math.max(1,window.devicePixelRatio||1);cv.width=Math.max(1,Math.round(r.width*dpr));cv.height=Math.max(1,Math.round(r.height*dpr));need=true}
+let ck={k:'',p:null};
+function checker(a,b){const k=a+b;if(ck.k!==k){const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d');x.fillStyle=a;x.fillRect(0,0,16,16);x.fillStyle=b;x.fillRect(0,0,8,8);x.fillRect(8,8,8,8);ck={k,p:cx.createPattern(c,'repeat')}}return ck.p}
+function draw(){need=false;const W=cv.width/dpr,H=cv.height/dpr,cs=getComputedStyle(document.documentElement),col=n=>cs.getPropertyValue(n).trim()||'#888';
+ cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,W,H);
+ const X=x=>VX+x*VS,Y=y=>VY+y*VS,sx=X(0),sy=Y(0),sw=S.W*VS,sh=S.H*VS;
+ cx.save();cx.shadowColor='rgba(0,0,0,.28)';cx.shadowBlur=14;cx.fillStyle=col('--pn');cx.fillRect(sx,sy,sw,sh);cx.restore();
+ cx.save();cx.beginPath();cx.rect(sx,sy,sw,sh);cx.clip();
+ const pt=checker(col('--pn'),col('--bg'));try{pt.setTransform(new DOMMatrix([1,0,0,1,VX,VY]))}catch(e){}cx.fillStyle=pt;cx.fillRect(sx,sy,sw,sh);
+ if(VS*10>=6){cx.strokeStyle=col('--ln');cx.lineWidth=1;
+  for(const[a,al]of[[0,.5],[1,1]]){cx.globalAlpha=al;cx.beginPath();
+   for(let v=10;v<S.W;v+=10)if((v%50==0)==!!a){const x=Math.round(X(v))+.5;cx.moveTo(x,sy);cx.lineTo(x,sy+sh)}
+   for(let v=10;v<S.H;v+=10)if((v%50==0)==!!a){const y=Math.round(Y(v))+.5;cx.moveTo(sx,y);cx.lineTo(sx+sw,y)}
+   cx.stroke()}cx.globalAlpha=1}
+ cx.restore();
+ cx.strokeStyle=col('--ac');cx.lineWidth=1.5;cx.strokeRect(sx,sy,sw,sh);
+ cx.save();cx.setLineDash([5,4]);cx.strokeStyle=col('--mu');cx.lineWidth=1;cx.strokeRect(X(S.m),Y(S.m),(S.W-2*S.m)*VS,(S.H-2*S.m)*VS);cx.restore();
+ cx.fillStyle=col('--mu');cx.font='12px sans-serif';cx.textBaseline='bottom';cx.fillText((+S.W.toFixed(1))+' × '+(+S.H.toFixed(1))+' mm',sx,sy-6);
+ const pr=problems();
+ for(const id of zo){const p=byId[id],q=it[id];if(!p||!q)continue;const d=dim(p),img=S.c?p.cut:p.img;
+  cx.save();cx.translate(X(q.x+d[0]/2),Y(q.y+d[1]/2));cx.rotate(q.r*Math.PI/2);cx.imageSmoothingQuality='high';cx.drawImage(img,-p.w*VS/2,-p.h*VS/2,p.w*VS,p.h*VS);cx.restore()}
+ for(const id of zo){const p=byId[id],q=it[id];if(!p||!q)continue;const a=rect(p),bad=pr.bad.has(id),on=sel&&sel.id==id;
+  if(bad){cx.fillStyle='rgba(224,71,106,.16)';cx.fillRect(X(a.x),Y(a.y),a.w*VS,a.h*VS)}
+  if(on){cx.save();cx.setLineDash([4,3]);cx.strokeStyle=col('--ac');cx.globalAlpha=.7;cx.lineWidth=1;cx.strokeRect(X(a.x-S.g),Y(a.y-S.g),(a.w+2*S.g)*VS,(a.h+2*S.g)*VS);cx.restore()}
+  cx.strokeStyle=bad?col('--bad'):on?col('--ac'):'rgba(128,138,160,.6)';cx.lineWidth=bad||on?2:1;cx.strokeRect(X(a.x),Y(a.y),a.w*VS,a.h*VS)}
+ for(const p of[hov,sel]){if(!p||!it[p.id])continue;const a=rect(p),t=p.name+' · '+a.w.toFixed(1)+'×'+a.h.toFixed(1)+'mm';
+  cx.font='11px sans-serif';cx.textBaseline='top';const tw=cx.measureText(t).width+10,tx=X(a.x),ty=Math.max(0,Y(a.y)-19);
+  cx.fillStyle='rgba(20,22,30,.82)';cx.fillRect(tx,ty,tw,17);cx.fillStyle='#fff';cx.fillText(t,tx+5,ty+3)}}
+/* ---- 선택·이동·자석 ---- */
+function hit(mx,my){const x=(mx-VX)/VS,y=(my-VY)/VS;for(let i=zo.length-1;i>=0;i--){const p=byId[zo[i]];if(!p||!it[p.id])continue;const r=rect(p);if(x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)return p}return null}
+function select(p){sel=p;if(p){const i=zo.indexOf(p.id);if(i>=0)zo.splice(i,1);zo.push(p.id)}ui()}
+function snapMove(p,nx,ny,alt){if(!$('shs').checked||alt)return[nx,ny];
+ const d=dim(p),w=d[0],h=d[1],thr=Math.max(.5,8/VS),g=S.g,O=parts.filter(q=>q!==p&&it[q.id]).map(rect);let bx=null,by=null;
+ const tx=v=>{const e=Math.abs(v-nx);if(e<=thr&&(!bx||e<bx.e))bx={e,v}},ty=v=>{const e=Math.abs(v-ny);if(e<=thr&&(!by||e<by.e))by={e,v}};
+ tx(S.m);tx(S.W-S.m-w);
+ for(const o of O)if(ny<o.y+o.h+g+thr&&ny+h>o.y-g-thr){tx(o.x+o.w+g);tx(o.x-g-w);tx(o.x);tx(o.x+o.w-w)}
+ const fx=bx?bx.v:nx;ty(S.m);ty(S.H-S.m-h);
+ for(const o of O)if(fx<o.x+o.w+g+thr&&fx+w>o.x-g-thr){ty(o.y+o.h+g);ty(o.y-g-h);ty(o.y);ty(o.y+o.h-h)}
+ return[fx,by?by.v:ny]}
+function rot(){if(!sel)return;pushU();const q=it[sel.id],d=dim(sel),mx=q.x+d[0]/2,my=q.y+d[1]/2;q.r=(q.r+1)%4;const e=dim(sel);q.x=+(mx-e[0]/2).toFixed(3);q.y=+(my-e[1]/2).toFixed(3);changed()}
+const ptr=new Map();let drag=null,pan=null,pinch=null,altK=false;
+const pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;try{cv.setPointerCapture(e.pointerId)}catch(_){}
+ const[mx,my]=pos(e);ptr.set(e.pointerId,[mx,my]);
+ if(ptr.size==2){drag=null;pan=null;const v=[...ptr.values()];pinch={d:Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1])||1,vs:VS};return}
+ const p=hit(mx,my);
+ if(p){select(p);const q=it[p.id];drag={p,dx:(mx-VX)/VS-q.x,dy:(my-VY)/VS-q.y,u:snap(),sx:mx,sy:my,moved:false};cv.style.cursor='move'}
+ else pan={x:mx,y:my,vx:VX,vy:VY,moved:false}});
+cv.addEventListener('pointermove',e=>{const[mx,my]=pos(e);if(ptr.has(e.pointerId))ptr.set(e.pointerId,[mx,my]);
+ if(pinch&&ptr.size>=2){const v=[...ptr.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);zoomAt((v[0][0]+v[1][0])/2,(v[0][1]+v[1][1])/2,pinch.vs*d/pinch.d);return}
+ if(drag){if(!drag.moved&&Math.hypot(mx-drag.sx,my-drag.sy)<3)return;if(!drag.moved){pushU(drag.u);drag.moved=true}
+  const s=snapMove(drag.p,(mx-VX)/VS-drag.dx,(my-VY)/VS-drag.dy,e.altKey||altK),q=it[drag.p.id];q.x=+s[0].toFixed(3);q.y=+s[1].toFixed(3);ui();return}
+ if(pan){if(Math.hypot(mx-pan.x,my-pan.y)>3)pan.moved=true;VX=pan.vx+mx-pan.x;VY=pan.vy+my-pan.y;need=true;cv.style.cursor='grabbing';return}
+ const p=hit(mx,my);if(p!==hov){hov=p;need=true}cv.style.cursor=p?'move':'grab'});
+const up=e=>{ptr.delete(e.pointerId);if(pinch&&ptr.size<2)pinch=null;
+ if(drag){if(drag.moved)changed();drag=null}
+ if(pan){if(!pan.moved){sel=null;ui()}pan=null}cv.style.cursor='grab'};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('pointerleave',()=>{if(hov){hov=null;need=true}});
+cv.addEventListener('wheel',e=>{e.preventDefault();const[mx,my]=pos(e),dy=e.deltaMode==1?e.deltaY*33:e.deltaY;zoomAt(mx,my,VS*Math.exp(-dy*(e.ctrlKey?.01:.0015)))},{passive:false});
+addEventListener('keydown',e=>{altK=e.altKey;const t=e.target,typing=t&&(t.tagName=='INPUT'||t.tagName=='SELECT'||t.tagName=='TEXTAREA');
+ if((e.ctrlKey||e.metaKey)&&!typing){const k=e.key.toLowerCase();if(k=='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(k=='y'){e.preventDefault();redo();return}}
+ if(typing)return;
+ if(e.key=='r'||e.key=='R'){rot();return}
+ if(e.key=='Escape'){sel=null;ui();return}
+ if(sel&&/^Arrow/.test(e.key)){e.preventDefault();const st=e.shiftKey?5:e.altKey?.1:1,q=it[sel.id],n=Date.now();if(n-nudgeT>700)pushU();nudgeT=n;
+  if(e.key=='ArrowLeft')q.x-=st;else if(e.key=='ArrowRight')q.x+=st;else if(e.key=='ArrowUp')q.y-=st;else q.y+=st;q.x=+q.x.toFixed(3);q.y=+q.y.toFixed(3);changed()}});
+addEventListener('keyup',e=>{altK=e.altKey});
+/* ---- 입력칸 ---- */
+function syncIn(){$('shw').value=+S.W.toFixed(2);$('shh').value=+S.H.toFixed(2);$('shg').value=S.g;$('shm').value=S.m;$('shr').checked=S.r;$('shc').checked=S.c;$('shdpi').value=S.d;preset()}
+function preset(){const k=(+S.W.toFixed(2))+'x'+(+S.H.toFixed(2));$('shp').value=[...$('shp').options].some(o=>o.value==k)?k:''}
+const upS=()=>{preset();changed()};
+$('shw').oninput=()=>{S.W=clamp(num($('shw').value,S.W),10,5000);upS()};
+$('shh').oninput=()=>{S.H=clamp(num($('shh').value,S.H),10,5000);upS()};
+$('shp').onchange=()=>{const v=$('shp').value;if(!v)return;const a=v.split('x');S.W=+a[0];S.H=+a[1];syncIn();fit();changed()};
+$('shg').oninput=()=>{S.g=Math.max(3,num($('shg').value,3));upS()};$('shg').onchange=()=>{$('shg').value=S.g};
+$('shm').oninput=()=>{S.m=clamp(num($('shm').value,3),0,Math.min(S.W,S.H)/2-1);upS()};$('shm').onchange=()=>{$('shm').value=S.m};
+$('shr').onchange=()=>{S.r=$('shr').checked;notify()};
+$('shc').onchange=()=>{S.c=$('shc').checked;changed()};
+$('shdpi').oninput=()=>{S.d=clamp(num($('shdpi').value,300),30,1200);notify()};$('shdpi').onchange=()=>{$('shdpi').value=S.d};
+const xy=k=>()=>{if(!sel)return;const v=num($('sh'+k).value,null);if(v===null)return;if(!inU){pushU();inU=true}it[sel.id][k]=v;changed()};
+$('shx').oninput=xy('x');$('shy').oninput=xy('y');$('shx').onchange=$('shy').onchange=()=>{inU=false};
+$('shrot').onclick=rot;$('shfit').onclick=fit;$('sh100').onclick=actual;
+$('shauto').onclick=()=>{if(!parts.length)return;pushU();const f=auto();changed();fit();setMsg(f?'자동 배치: 판에 안 들어간 파츠 '+f+'개는 판 오른쪽 밖에 두었습니다 (판을 키우거나 회전 허용을 켜 보세요)':'자동 배치 완료')};
+$('lund').onclick=undo;$('lred').onclick=redo;
+$('lref').onclick=()=>{post({type:'refresh'});setMsg('메인 창의 최신 파츠를 불러오는 중…')};
+$('lcl').onclick=()=>{post({type:'layout',layout:payload()});if(window.opener)window.close();else post({type:'close'})};
+/* ---- 내보내기 (PNG, DPI 정보 포함) ---- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=t[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}})();
+async function withDpi(blob,dpi){try{const buf=new Uint8Array(await blob.arrayBuffer());let o=8;
+ while(o<buf.length){const len=((buf[o]<<24)|(buf[o+1]<<16)|(buf[o+2]<<8)|buf[o+3])>>>0,ty=String.fromCharCode(buf[o+4],buf[o+5],buf[o+6],buf[o+7]);if(ty=='pHYs')return blob;if(ty=='IDAT')break;o+=12+len}
+ const ppm=Math.round(dpi/0.0254),c=new Uint8Array(21),dv=new DataView(c.buffer);dv.setUint32(0,9);c.set([112,72,89,115],4);dv.setUint32(8,ppm);dv.setUint32(12,ppm);c[16]=1;dv.setUint32(17,CRC(c.subarray(4,17)));
+ return new Blob([buf.subarray(0,33),c,buf.subarray(33)],{type:'image/png'})}catch(e){return blob}}
+function dl(name,blob){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000)}
+async function exportPng(){if(!parts.length)return;let dpi=clamp(num($('shdpi').value,300),30,1200);const W=S.W,H=S.H,asked=dpi;
+ const over=()=>{const s=dpi/25.4;return Math.max(W*s,H*s)>16000||W*s*H*s>1.2e8};
+ while(over()&&dpi>30)dpi=Math.floor(dpi*.9);
+ setMsg('PNG 만드는 중…');await new Promise(r=>setTimeout(r,30));
+ let blob=null;
+ for(let t=0;t<4&&!blob;t++){const s=dpi/25.4,c=document.createElement('canvas');c.width=Math.max(1,Math.round(W*s));c.height=Math.max(1,Math.round(H*s));
+  const x=c.getContext('2d');if(!x){dpi=Math.floor(dpi*.7);continue}x.imageSmoothingQuality='high';
+  for(const id of zo){const p=byId[id],q=it[id];if(!p||!q)continue;const d=dim(p);x.save();x.translate((q.x+d[0]/2)*s,(q.y+d[1]/2)*s);x.rotate(q.r*Math.PI/2);x.drawImage(S.c?p.cut:p.img,-p.w*s/2,-p.h*s/2,p.w*s,p.h*s);x.restore()}
+  blob=await new Promise(r=>c.toBlob(r,'image/png'));if(!blob)dpi=Math.floor(dpi*.7)}
+ if(!blob){setMsg('PNG를 만들지 못했습니다. DPI를 낮춰 다시 시도하세요');return}
+ blob=await withDpi(blob,dpi);
+ let outside=0;for(const p of parts){if(!it[p.id])continue;const a=rect(p);if(a.x<-E||a.y<-E||a.x+a.w>W+E||a.y+a.h>H+E)outside++}
+ dl('acrylic-layout-'+(+W.toFixed(1))+'x'+(+H.toFixed(1))+'mm-'+dpi+'dpi.png',blob);
+ const pr=problems();
+ setMsg('저장했습니다 · '+dpi+'DPI'+(dpi<asked?' (용량 한계로 낮춤)':'')+(outside?' · ⚠ 판 밖 파츠 '+outside+'개는 포함되지 않음':'')+(pr.pairs?' · ⚠ 간격 부족 '+pr.pairs+'쌍':''))}
+$('shsave').onclick=exportPng;
+
+/* ---- 참고용 PDF (파츠별 페이지 + 칼선 벡터 페이지) ---- */
+const PK=72/25.4,f4=v=>(+(+v).toFixed(4)).toString(),FONT='"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif';
+async function deflate(u){const cs=new CompressionStream('deflate'),w=cs.writable.getWriter();w.write(u);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+const u16=s=>'<FEFF'+Array.from({length:s.length},(_,i)=>s.charCodeAt(i).toString(16).padStart(4,'0')).join('')+'>';
+const toCv=b=>{const c=document.createElement('canvas');c.width=b.width;c.height=b.height;c.getContext('2d').drawImage(b,0,0);return c};
+/* 알파 마스크의 외곽·구멍 윤곽을 벡터 경로로 (픽셀 경계 추적 → 직선 단순화) */
+function trace(c,eps){const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data,W1=w+1,out=new Map(),on=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&d[(y*w+x)*4+3]>127;
+ const add=(x0,y0,x1,y1)=>{const k=y0*W1+x0;let a=out.get(k);if(!a)out.set(k,a=[]);a.push(y1*W1+x1)};
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(on(x,y)){if(!on(x,y-1))add(x,y,x+1,y);if(!on(x+1,y))add(x+1,y,x+1,y+1);if(!on(x,y+1))add(x+1,y+1,x,y+1);if(!on(x-1,y))add(x,y+1,x,y)}
+ const res=[];
+ while(out.size){const k0=out.keys().next().value;let k=k0,P=[];
+  do{const a=out.get(k);if(!a)break;const nx=a.pop();if(!a.length)out.delete(k);P.push([k%W1,(k/W1)|0]);k=nx}while(k!==k0);
+  if(P.length<4)continue;
+  const Q=P.filter((p,i)=>{const a=P[(i+P.length-1)%P.length],b=P[(i+1)%P.length];return(p[0]-a[0])*(b[1]-p[1])!==(p[1]-a[1])*(b[0]-p[0])});
+  if(Q.length<3)continue;
+  const rdp=A=>{const keep=new Uint8Array(A.length);keep[0]=keep[A.length-1]=1;const st=[[0,A.length-1]];
+   while(st.length){const[i,j]=st.pop();let md=0,mi=-1;const ax=A[i][0],ay=A[i][1],dx=A[j][0]-ax,dy=A[j][1]-ay,L=Math.hypot(dx,dy)||1;
+    for(let m=i+1;m<j;m++){const dd=Math.abs((A[m][0]-ax)*dy-(A[m][1]-ay)*dx)/L;if(dd>md){md=dd;mi=m}}
+    if(md>eps&&mi>0){keep[mi]=1;st.push([i,mi],[mi,j])}}
+   return A.filter((_,i)=>keep[i])};
+  let fj=0,fd=-1;for(let i=1;i<Q.length;i++){const dd=Math.hypot(Q[i][0]-Q[0][0],Q[i][1]-Q[0][1]);if(dd>fd){fd=dd;fj=i}}
+  const A=rdp(Q.slice(0,fj+1)),B=rdp(Q.slice(fj).concat([Q[0]])),S2=A.concat(B.slice(1,-1));
+  if(S2.length>=3)res.push(S2)}
+ return res}
+async function buildPdf(){
+ const HAS=typeof CompressionStream!=='undefined',FL=HAS?'/Filter/FlateDecode':'',def=async u=>HAS?await deflate(u):u,enc=new TextEncoder(),chunks=[],offs=[],pages=[];let len=0,n=2;
+ const push=b=>{chunks.push(b);len+=b.length},str=s=>push(enc.encode(s));
+ const obj=(id,dict,stream)=>{offs[id]=len;str(id+' 0 obj\n');if(stream){str(dict.replace(/>>$/,'/Length '+stream.length+'>>')+'\nstream\n');push(stream);str('\nendstream\nendobj\n')}else str(dict+'\nendobj\n')};
+ push(new Uint8Array([0x25,0x50,0x44,0x46,0x2d,0x31,0x2e,0x35,0x0a,0x25,0xe2,0xe3,0xcf,0xd3,0x0a]));
+ const img=async(c,alpha)=>{const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data,rgb=new Uint8Array(w*h*3),a=alpha?new Uint8Array(w*h):null;
+  for(let y=0;y<h;y++){let r=255,g=255,b=255;for(let x=0;x<w;x++){const i=y*w+x,j=i*4;if(!alpha||d[j+3]>0){r=d[j];g=d[j+1];b=d[j+2]}rgb[i*3]=r;rgb[i*3+1]=g;rgb[i*3+2]=b;if(a)a[i]=d[j+3]}}
+  let sm='';if(a){const sid=++n;obj(sid,'<</Type/XObject/Subtype/Image/Width '+w+'/Height '+h+'/ColorSpace/DeviceGray/BitsPerComponent 8'+FL+'>>',await def(a));sm='/SMask '+sid+' 0 R'}
+  const id=++n;obj(id,'<</Type/XObject/Subtype/Image/Width '+w+'/Height '+h+'/ColorSpace/DeviceRGB/BitsPerComponent 8/Interpolate true'+sm+FL+'>>',await def(rgb));return id};
+ const page=async(W,H,content,res)=>{const cid=++n,pid=++n;obj(cid,'<<'+FL+'>>',await def(enc.encode(PK+' 0 0 '+PK+' 0 0 cm\n'+content)));
+  obj(pid,'<</Type/Page/Parent 2 0 R/MediaBox[0 0 '+f4(W*PK)+' '+f4(H*PK)+']/Contents '+cid+' 0 R/Resources<</XObject<<'+Object.entries(res).map(([k,v])=>'/'+k+' '+v+' 0 R').join('')+'>>>>>>');pages.push(pid)};
+ const put=(nm,x,y,w,h,PH)=>'q '+[w,0,0,h,x,PH-y-h].map(f4).join(' ')+' cm /'+nm+' Do Q\n';
+ const PPM=150/25.4,cvs=(w,h)=>{const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*PPM));c.height=Math.max(1,Math.round(h*PPM));const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.textBaseline='top';return[c,x]};
+ const label=async(t,w,h)=>{const[c,x]=cvs(w,h);x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.fillStyle='#222';x.font='600 '+Math.round(h*.5*PPM)+'px '+FONT;x.fillText(t,2*PPM,h*.2*PPM);return img(c,false)};
+ const lines=(w,list)=>{const[c0,x0]=cvs(w,10);const wrapped=[];for(const L of list){x0.font=L.f+'px '+FONT;const maxW=(w-2*L.ml-20)*PPM;let cur='';for(const ch of L.t){if(x0.measureText(cur+ch).width>maxW){wrapped.push({...L,t:cur});cur=ch}else cur+=ch}wrapped.push({...L,t:cur})}return wrapped};
+ /* 파츠별 데이터: 이미지·칼선 경로 */
+ const D=[];
+ for(const p of parts){const cvp=toCv(p.img),mmx=p.w/cvp.width,mmy=p.h/cvp.height,id=await img(cvp,true);let loops=null;
+  if(p.ol>0){const L=trace(cvp,Math.max(.75,.04/mmx));if(L.length)loops=L.map(l=>l.map(q=>[q[0]*mmx,q[1]*mmy]))}
+  D.push({p,id,loops})}
+ const placed=D.filter(d=>it[d.p.id]);
+ const plan=[{t:'sheet'}];if(placed.some(d=>d.loops))plan.push({t:'sheetcut'});
+ for(const d of D){plan.push({t:'part',d});if(d.loops)plan.push({t:'cut',d})}
+ /* 1쪽: 안내문 */
+ const W=210,items=[{t:'⚠ 참고용 PDF입니다 — 일러스트레이터 등에서 수정해서 사용하세요',f:'700 '+Math.round(5.2*PPM),c:'#b3203f',ml:12,gap:3},
+ {t:'이 PDF는 배치와 모양을 확인하기 위한 참고용 파일입니다. 그대로 제작·인쇄·재단에 사용하지 마세요.',f:'500 '+Math.round(3.6*PPM),c:'#222',ml:12,gap:2},
+ {t:'Adobe Illustrator 등 벡터 편집 프로그램에서 열어 도안을 다시 정리·수정(글자 아웃라인, 색상, 칼선 등)한 뒤 최종 제작 파일로 사용하세요.',f:'500 '+Math.round(3.6*PPM),c:'#222',ml:12,gap:2},
+ {t:'• 아트워크는 비트맵(그림) 이미지이고, 칼선만 벡터 선(마젠타 0.25pt)입니다. 글자·도형은 벡터로 다시 그려야 합니다.',f:'400 '+Math.round(3.3*PPM),c:'#444',ml:12,gap:1},
+ {t:'• 칼선은 「칼선 여유」가 지정된 파츠에만 있으며, 그 파츠의 아트워크 페이지 바로 다음 장에 따로 들어 있습니다.',f:'400 '+Math.round(3.3*PPM),c:'#444',ml:12,gap:1},
+ {t:'• 모든 페이지는 실제 크기(1:1, mm 기준)입니다. 판 배치 페이지는 판 크기 '+(+S.W.toFixed(1))+'×'+(+S.H.toFixed(1))+'mm 그대로입니다.',f:'400 '+Math.round(3.3*PPM),c:'#444',ml:12,gap:1},
+ {t:'• 표시된 모양은 미리보기용 근사치입니다. 최종 제작 전에는 실제 도면과 반드시 대조하세요.',f:'400 '+Math.round(3.3*PPM),c:'#444',ml:12,gap:5},
+ {t:'페이지 안내',f:'700 '+Math.round(4*PPM),c:'#222',ml:12,gap:2}];
+ const tl=[];plan.forEach((e,i)=>{const pg='p.'+(i+2)+'  ';let t;
+  if(e.t=='sheet')t=pg+'판 배치 — 아트워크 (전체 파츠, '+(+S.W.toFixed(1))+'×'+(+S.H.toFixed(1))+'mm)';
+  else if(e.t=='sheetcut')t=pg+'판 배치 — 칼선 (벡터)';
+  else if(e.t=='part')t=pg+e.d.p.name+' — 아트워크 ('+e.d.p.w.toFixed(1)+'×'+e.d.p.h.toFixed(1)+'mm)';
+  else t=pg+e.d.p.name+' — 칼선 (벡터, 여유 '+(+e.d.p.ol.toFixed(2))+'mm)';
+  tl.push({t,f:'400 '+Math.round(3.2*PPM),c:'#333',ml:e.t=='cut'||e.t=='sheetcut'?18:12,gap:.5})});
+ const all=lines(W,items.concat(tl.slice(0,60)));
+ if(tl.length>60)all.push({t:'… 외 '+(tl.length-60)+'페이지',f:'400 '+Math.round(3.2*PPM),c:'#333',ml:12,gap:.5});
+ let y=14;for(const L of all)y+=parseInt(L.f.split(' ')[1])/PPM*1.35+L.gap;
+ const NH=Math.max(297,Math.ceil(y+12)),[nc,nx]=cvs(W,NH);
+ nx.fillStyle='#fdecef';nx.fillRect(8*PPM,8*PPM,(W-16)*PPM,(parseInt(all[0].f.split(' ')[1])/PPM*1.35*Math.max(1,all.filter((L,i)=>i<8&&L.c=='#b3203f').length)+6)*PPM);
+ y=14;nx.textBaseline='top';for(const L of all){nx.fillStyle=L.c;nx.font=L.f+'px '+FONT;nx.fillText(L.t,L.ml*PPM,y*PPM);y+=parseInt(L.f.split(' ')[1])/PPM*1.35+L.gap}
+ await page(W,NH,put('N',0,0,W,NH,NH),{N:await img(nc,false)});
+ /* 판 배치 */
+ const rt=r=>[[1,0],[0,-1],[-1,0],[0,1]][r%4];
+ const TF=(d,q)=>{const[c,s]=rt(q.r),w=d.p.w,h=d.p.h,rw=q.r%2?h:w,rh=q.r%2?w:h,cx0=q.x+rw/2,cy0=H_-(q.y+rh/2);return{
+  m:[c*w,s*w,-s*h,c*h,cx0-c*w/2+s*h/2,cy0-s*w/2-c*h/2],pt:(lx,ly)=>{const a=lx-w/2,b=-(ly-h/2);return[c*a-s*b+cx0,s*a+c*b+cy0]}}};
+ let H_=S.H;
+ {let ct='',res={};placed.forEach((d,i)=>{const t=TF(d,it[d.p.id]);ct+='q '+t.m.map(f4).join(' ')+' cm /I'+i+' Do Q\n';res['I'+i]=d.id});await page(S.W,S.H,ct,res)}
+ if(plan.some(e=>e.t=='sheetcut')){let ct='0.9 0 0.47 RG '+f4(.25/PK)+' w 1 j 1 J\n';for(const d of placed){if(!d.loops)continue;const t=TF(d,it[d.p.id]);for(const l of d.loops){ct+=l.map((q,i)=>{const z=t.pt(q[0],q[1]);return f4(z[0])+' '+f4(z[1])+(i?' l':' m')}).join('\n')+'\nh\n'}}ct+='S\n';await page(S.W,S.H,ct,{})}
+ /* 파츠별 */
+ for(const d of D){const p=d.p,pad=5,lab=8,pw=Math.max(p.w+2*pad,70),ph=p.h+2*pad+lab,ox=(pw-p.w)/2,oy=lab+pad;
+  await page(pw,ph,put('L',0,0,pw,lab,ph)+put('A',ox,oy,p.w,p.h,ph),{L:await label(p.name+' — 아트워크 · '+p.w.toFixed(1)+'×'+p.h.toFixed(1)+'mm',pw,lab),A:d.id});
+  if(d.loops){let ct='0.9 0 0.47 RG '+f4(.25/PK)+' w 1 j 1 J\n';for(const l of d.loops)ct+=l.map((q,i)=>f4(ox+q[0])+' '+f4(ph-(oy+q[1]))+(i?' l':' m')).join('\n')+'\nh\n';ct+='S\n';
+   await page(pw,ph,put('L',0,0,pw,lab,ph)+ct,{L:await label(p.name+' — 칼선(벡터) · 여유 '+(+p.ol.toFixed(2))+'mm',pw,lab)})}}
+ /* 마무리 */
+ const info=++n;obj(info,'<</Title'+u16('아크릴판 배치 (참고용 — 일러스트레이터 등에서 수정해서 사용)')+'/Creator'+u16('아크릴 케이스 목업')+'/Subject'+u16('참고용 PDF. 그대로 제작에 쓰지 말고 편집 후 사용')+'>>');
+ obj(1,'<</Type/Catalog/Pages 2 0 R>>');obj(2,'<</Type/Pages/Kids['+pages.map(i=>i+' 0 R').join(' ')+']/Count '+pages.length+'>>');
+ const xr=len;str('xref\n0 '+(n+1)+'\n0000000000 65535 f \n');for(let i=1;i<=n;i++)str(String(offs[i]).padStart(10,'0')+' 00000 n \n');
+ str('trailer\n<</Size '+(n+1)+'/Root 1 0 R/Info '+info+' 0 R>>\nstartxref\n'+xr+'\n%%EOF\n');
+ return new Blob(chunks,{type:'application/pdf'})}
+$('shpdf').onclick=async()=>{if(!parts.length)return;setMsg('PDF 만드는 중…');await new Promise(r=>setTimeout(r,30));
+ try{const b=await buildPdf();dl('acrylic-reference-'+(+S.W.toFixed(1))+'x'+(+S.H.toFixed(1))+'mm.pdf',b);
+  const nc=parts.filter(p=>p.ol>0).length;setMsg('참고용 PDF를 저장했습니다 · 파츠 '+parts.length+'개'+(nc?' · 칼선 페이지 '+nc+'개':' · 칼선 여유가 지정된 파츠가 없어 칼선 페이지는 없음'))}
+ catch(e){setMsg('PDF 생성 실패: '+e.message)}};
+/* ---- 메인 창과 통신 ---- */
+addEventListener('message',async e=>{const m=e.data;if(!m||m.app!=='acr-layout'||m.type!=='init')return;if(host&&e.source!==host)return;
+ const d=m.data,ld=v=>typeof v=='string'?new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=v}):Promise.resolve(v);
+ const np=await Promise.all(d.parts.map(async p=>({id:p.id,name:String(p.name||'파츠'),w:p.w,h:p.h,img:await ld(p.img),cut:await ld(p.cut),ol:Math.max(0,+p.ol||0)})));
+ const first=!inited;
+ if(first){const L=d.layout||{};S.W=clamp(num(L.W,300),10,5000);S.H=clamp(num(L.H,200),10,5000);S.g=Math.max(3,num(L.g,3));S.m=clamp(num(L.m,3),0,Math.min(S.W,S.H)/2-1);S.r=!!L.r;S.c=L.c===undefined?!!d.cut:L.c!==false;S.d=clamp(num(L.d,300),30,1200);
+  it={};if(L.items&&typeof L.items=='object')for(const k in L.items){const i=L.items[k];if(i&&Number.isFinite(+i.x)&&Number.isFinite(+i.y))it[k]={x:+i.x,y:+i.y,r:((+i.r||0)%4+4)%4}}}
+ parts=np;byId={};np.forEach(p=>byId[p.id]=p);
+ for(const k in it)if(!byId[k])delete it[k];
+ zo=zo.filter(id=>byId[id]);np.forEach(p=>{if(!zo.includes(p.id))zo.push(p.id)});
+ if(sel)sel=byId[sel.id]||null;
+ const miss=np.filter(p=>!it[p.id]);let note='';
+ if(miss.length){if(miss.length==np.length){auto();note='처음이라 자동 배치했습니다'}else{auto(miss);note='새 파츠 '+miss.length+'개를 빈 곳에 놓았습니다'}}
+ else if(!first)note='메인 창의 변경을 반영했습니다';
+ inited=true;syncIn();if(first||miss.length)fit();if(note)setMsg(note);else ui();if(miss.length)notify()});
+addEventListener('pagehide',()=>{clearTimeout(nt);if(inited)post({type:'layout',layout:payload()})});
+new ResizeObserver(resize).observe(lc);addEventListener('resize',resize);
+(function L(){requestAnimationFrame(L);if(need)draw()})();
+resize();ui();post({type:'ready'});
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
@@ -419,7 +733,7 @@ $('mat').onchange=()=>{$('wo').value=P[$('mat').value][0];buildAll()};
 ['wo','th','cut','acm','acut'].forEach(i=>$(i).addEventListener('input',()=>{lbl();qb();sync()}));
 $('ro').addEventListener('input',()=>{lbl();const r=+$('ro').value;parts.forEach(p=>{if(p.wm)p.wm.roughness=r});need=true});
 $('otol').addEventListener('input',()=>sched());
-$('ex').oninput=()=>{parts.forEach(place);attach();sched()};$('rst').onclick=()=>init();
+$('ex').oninput=()=>{parts.forEach(place);attach();sched()};$('rst').onclick=()=>{init();LAYO=null};
 $('shot').onclick=async()=>{const v=tc.visible;tc.visible=false;ren.render(sc,cam);const pr=blobOf(ren.domElement);tc.visible=v;need=true;save('acrylic-mockup.png',await pr)};
 let dn=null;const rc=new THREE.Raycaster(),cvs=ren.domElement;
 cvs.addEventListener('pointerdown',e=>dn=[e.clientX,e.clientY]);
@@ -462,12 +776,37 @@ $('fcall').onclick=()=>{parts.forEach(p=>paint(p,$('fc').value));sync();cmS()};
 $('fcrs').onclick=()=>{parts.forEach(p=>paint(p,SCOL[p.role]||SCOL.fig));sync();cmS()};
 $('wo').value=P.clear[0];size();init();cur=snapS();
 
+/* ===== 아크릴판 배치: 새 창에서 편집 · 내보내기 ===== */
+let LAYO=null,LW=null;
+const layClean=L=>{if(!L||typeof L!=='object')return null;const n=(v,d,lo,hi)=>{v=+v;return Number.isFinite(v)?Math.min(hi,Math.max(lo,v)):d},o={W:n(L.W,300,10,5000),H:n(L.H,200,10,5000),g:n(L.g,3,3,100),m:n(L.m,3,0,100),r:!!L.r,c:L.c!==false,d:n(L.d,300,30,1200),items:{}};
+if(L.items&&typeof L.items==='object')for(const k in L.items){const i=L.items[k];if(i&&Number.isFinite(+i.x)&&Number.isFinite(+i.y))o.items[k]={x:+i.x,y:+i.y,r:((+i.r||0)%4+4)%4}}return o};
+function bbox(c){const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>20){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}return x1<0?null:{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1}}
+const crop=(c,r)=>{const o=cv(r.w,r.h);o.getContext('2d').drawImage(c,r.x,r.y,r.w,r.h,0,0,r.w,r.h);return o};
+const bmp=c=>self.createImageBitmap?createImageBitmap(c):Promise.resolve(c.toDataURL('image/png'));
+/* 파츠마다 '실제 제작되는 모양'(구멍·꽂는 부분·칼선 여유 반영)을 잘라내 mm 크기와 함께 보냅니다 */
+async function layData(){const o=gopt(),q={...o,wo:1},list=[],tr=[];
+for(const p of parts){const s=pre(p,p.src,o),a=proc(s,{...q,cut:false}).pc,b=proc(s,{...q,cut:true}).pc,r=bbox(b);if(!r)continue;
+const mx=p.w/p.src.width,my=p.h/p.src.height,A=await bmp(crop(a,r)),B=await bmp(crop(b,r));
+list.push({id:p.id,name:p.name,w:r.w*mx,h:r.h*my,img:A,cut:B,ol:olOf(p)});for(const v of[A,B])if(typeof v!=='string')tr.push(v)}return{list,tr}}
+async function layPush(t){try{const d=await layData();t.postMessage({app:'acr-layout',type:'init',data:{parts:d.list,layout:LAYO,cut:$('cut').checked}},'*',d.tr)}catch(err){flash('배치 창에 파츠를 보내지 못했습니다: '+err.message)}}
+const layDoc=()=>{const th=document.documentElement.dataset.theme;return'<!DOCTYPE html><html lang="ko"'+(th?' data-theme="'+th+'"':'')+'><head><meta charset="utf-8"><title>아크릴판 배치</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+$('lay-css').textContent+'</style></head><body>'+$('lay-body').textContent+'<script>'+$('lay-js').textContent+'<\/script></body></html>'};
+function layOpen(){if(LW&&!LW.closed){LW.focus();layPush(LW);return}
+let w=null;try{w=window.open('','acr-layout','popup=yes,width=1280,height=860,resizable=yes')}catch(e){}
+if(w){try{w.document.open();w.document.write(layDoc());w.document.close();LW=w;w.focus();return}catch(e){try{w.close()}catch(_){}}}
+$('lfr').srcdoc=layDoc();$('lay').hidden=false;flash('팝업이 차단되어 현재 화면 위에 열었습니다. 주소창에서 팝업을 허용하면 새 창으로 열립니다')}
+$('layo').onclick=layOpen;
+addEventListener('message',e=>{const m=e.data;if(!m||m.app!=='acr-layout')return;if(e.source!==LW&&e.source!==$('lfr').contentWindow)return;
+if(m.type==='ready'||m.type==='refresh')layPush(e.source);
+else if(m.type==='layout'){LAYO=layClean(m.layout);autoSave()}
+else if(m.type==='close'){$('lay').hidden=true;$('lfr').srcdoc=''}});
+
 /* ===== 프로젝트 저장 / 불러오기 / 자동 저장 ===== */
 const SET=['chk','trim','keyc','dpi','lock','mt','tol','ts','rs','sp','osn','osd','osc','otol','ex','mat','wo','ro','th','cut','bgon','bgc','acut','acm'];
 const ICA=new WeakMap(),toURL=c=>{let u=ICA.get(c);if(!u){u=c.toDataURL('image/png');ICA.set(c,u)}return u};
 function pack(){const im=[],ix=new Map(),ref=c=>{if(!c)return null;if(!ix.has(c)){ix.set(c,im.length);im.push(toURL(c))}return ix.get(c)},st={};
 SET.forEach(id=>{const e=$(id);st[id]=e.type=='checkbox'?e.checked:e.value});
-return{app:'acrylic-mockup',ver:2,saved:new Date().toISOString(),settings:st,cam:{p:cam.position.toArray(),t:ctl.target.toArray()},sel:sel?sel.id:null,
+return{app:'acrylic-mockup',ver:2,saved:new Date().toISOString(),settings:st,cam:{p:cam.position.toArray(),t:ctl.target.toArray()},sel:sel?sel.id:null,layout:LAYO,
 parts:parts.map(p=>{const o={src:ref(p.src),src2:ref(p.src2),pos:[...p.pos],rot:[...p.rot],tab:p.tab||null,holes:p.holes||null};KEYS.forEach(k=>{if(p[k]!==undefined)o[k]=p[k]});return o}),images:im}}
 const dec=u=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>{const c=cv(i.width,i.height);c.getContext('2d').drawImage(i,0,0);ICA.set(c,u);res(c)};i.onerror=()=>rej(new Error('이미지를 읽을 수 없습니다'));i.src=u});
 const v3=a=>Array.isArray(a)&&a.length==3&&a.every(Number.isFinite);
@@ -480,7 +819,7 @@ const oldV=(d.ver||1)<2;if(oldV){$('acut').checked=false;$('acm').value=2}
 $('ts').onchange();$('rs').onchange();$('sp').onchange();applyBg();
 const used=new Set(),L=d.parts.map(o=>{const p={...o,src:cs[o.src],src2:o.src2==null?null:cs[o.src2]};if(oldV){const px=+o.ol||0;p.ol=px>0?+(px*o.w/p.src.width).toFixed(2):null}if(!p.tab)delete p.tab;if(!p.holes)delete p.holes;if(!p.id||used.has(p.id))p.id=0;used.add(p.id);return p});
 pid=Math.max(0,...L.map(p=>p.id));L.forEach(p=>{if(!p.id)p.id=++pid});
-restore({L,th:$('th').value,sel:d.sel});
+restore({L,th:$('th').value,sel:d.sel});LAYO=layClean(d.layout);if(LW&&!LW.closed)layPush(LW);
 if(d.cam&&v3(d.cam.p)&&v3(d.cam.t)){cam.position.fromArray(d.cam.p);ctl.target.fromArray(d.cam.t);ctl.update()}
 U=[];Rd=[];cur=snapS()}
 const DBN='acrylic-mockup-v1',idb=()=>new Promise((res,rej)=>{const r=indexedDB.open(DBN,1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
@@ -489,7 +828,7 @@ const idbGet=async k=>{const db=await idb();return new Promise((res,rej)=>{const
 let asT=null,restoring=true,lastSg='';
 try{$('asv').checked=localStorage.getItem('acr_auto')!='0'}catch(e){}
 $('asv').onchange=()=>{try{localStorage.setItem('acr_auto',$('asv').checked?'1':'0')}catch(e){}$('asst').textContent=$('asv').checked?'':'자동 저장 꺼짐';autoSave()};
-function autoSave(){if(!$('asv').checked||restoring)return;clearTimeout(asT);asT=setTimeout(async()=>{const sg=snapS().sig+'|'+SET.map(id=>$(id).value+$(id).checked).join();if(sg===lastSg)return;try{lastSg=sg;await idbSet('proj',JSON.stringify(pack()));$('asst').textContent='자동 저장됨 '+new Date().toLocaleTimeString('ko-KR')}catch(e){$('asst').textContent='자동 저장 실패 (브라우저 저장소를 쓸 수 없음) — .json으로 저장해 주세요'}},1500)}
+function autoSave(){if(!$('asv').checked||restoring)return;clearTimeout(asT);asT=setTimeout(async()=>{const sg=snapS().sig+'|'+SET.map(id=>$(id).value+$(id).checked).join()+'|'+JSON.stringify(LAYO);if(sg===lastSg)return;try{lastSg=sg;await idbSet('proj',JSON.stringify(pack()));$('asst').textContent='자동 저장됨 '+new Date().toLocaleTimeString('ko-KR')}catch(e){$('asst').textContent='자동 저장 실패 (브라우저 저장소를 쓸 수 없음) — .json으로 저장해 주세요'}},1500)}
 ['change','input','click','pointerup','keyup'].forEach(n=>document.addEventListener(n,autoSave,true));
 $('psave').onclick=async()=>{try{const d=new Date(),z=n=>String(n).padStart(2,'0'),b=new Blob([JSON.stringify(pack())],{type:'application/json'});
 await save('acrylic-project-'+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+'.json',b);flash('프로젝트 파일을 저장했습니다')}catch(e){alert('저장 실패: '+e.message)}};
@@ -531,7 +870,7 @@ T('h1','아크릴','처음 시작하기');
 T('small','시점','앞 · 뒤 · 좌');W(side.querySelector('[data-view=iso]'),'기본 시점');
 L('bgon','배경색 깔기');L('ex','분해');L('cut','칼선 표시');W($('shot'),'현재 화면 저장');
 /* 파츠 */
-T('h2','파츠 (','파츠 목록');W($('add'),'이미지로 파츠 추가');W($('rst'),'기본 배치로');W($('auto'),'자동 조립');
+T('h2','파츠 (','파츠 목록');W($('add'),'이미지로 파츠 추가');W($('rst'),'기본 배치로');W($('layo'),'아크릴판 배치');W($('auto'),'자동 조립');
 L('dpi','이미지 해상도');
 {const l=$('trim').closest('label');l.classList.add('hl');$('trim').parentElement.after(mk('여백 자동 제거'));$('keyc').parentElement.after(mk('여백 자동 제거'))}
 /* 선택한 파츠 */
