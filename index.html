@@ -151,7 +151,7 @@ label.hl{justify-content:flex-start}label.hl>:last-child:not(.hb){margin-left:au
 <article data-g="선택한 파츠" data-t="앞면 · 뒷면 흰 잉크"><p>파츠마다 앞면/뒷면을 따로 정합니다. <b>있음</b>은 흰색 계열도 꽉 차게, <b>없음</b>은 흰 부분이 투명하게 비치게 보여 줍니다. <b>재질 따름</b>은 재질 설정의 불투명도를 따릅니다.</p></article>
 <article data-g="선택한 파츠" data-t="칼선 여유 (파츠별, mm)"><p>선택한 파츠의 그림 외곽에서 바깥쪽으로 칼선을 얼마나 띄울지 mm로 정합니다. 그림과 칼선 사이는 투명 영역으로 남습니다.</p><ul><li><b>전체 설정 따름</b>: 「아크릴 칼선」의 기본값(처음 2mm)을 그대로 씁니다. 기본값을 바꾸면 이 파츠도 같이 바뀝니다.</li><li><b>직접 지정</b>: 슬라이더로 0.1~10mm 사이에서 이 파츠만 따로 정합니다.</li><li><b>없음</b>: 이 파츠는 칼선을 만들지 않고 그림 모양 그대로 둡니다.</li><li>꽂는 부분과 구멍은 칼선 바깥에서 붙고 뚫리므로 입력한 mm 크기 그대로 유지됩니다.</li><li>케이스 판(앞·뒤·좌·우·상·하)과 처음 견본의 내부파츠는 조립 치수가 어긋나지 않도록 「없음」으로 시작합니다. 새로 추가한 파츠는 「전체 설정 따름」으로 시작합니다.</li></ul></article>
 <article data-g="선택한 파츠" data-t="복제 · 삭제"><ul><li><b>복제</b>: 이미지·구멍·꽂는 부분까지 그대로 복사해 옆에 놓습니다.</li><li><b>삭제</b>: 선택한 파츠를 지웁니다.</li></ul></article>
-<article data-g="스탠드 꽂는 부분" data-t="꽂는 부분 만들기"><p>스탠드로 쓸 파츠를 선택하고 체크하면 그림 영역의 끝에 탭이 붙습니다. 탭 두께는 아크릴 두께와 같습니다.</p></article>
+<article data-g="스탠드 꽂는 부분" data-t="꽂는 부분 만들기"><p>스탠드로 쓸 파츠를 선택하고 체크하면 그림 영역의 끝에 탭이 붙습니다. 탭 두께는 아크릴 두께와 같습니다.</p><p>그림 실루엣이 탭 위치까지 닿지 않아 사이가 떨어져 있으면, 그 사이(밑부분)를 <b>탭 폭만큼 자동으로 메워</b> 그림과 탭이 한 덩어리로 이어지게 만듭니다(메운 부분은 흰색 아크릴 면).</p></article>
 <article data-g="스탠드 꽂는 부분" data-t="폭 · 길이 · 꽂는 면 · 위치 미세조정"><ul><li><b>폭/길이</b>: 탭의 크기(mm)입니다.</li><li><b>꽂는 면</b>: 아래(바닥)·위·왼쪽·오른쪽 중 탭이 붙는 쪽입니다.</li><li><b>위치 미세조정</b>: 탭을 가운데에서 좌우(또는 상하)로 옮깁니다.</li></ul></article>
 <article data-g="스탠드 꽂는 부분" data-t="꽂는 부분 → 닿는 판에 구멍 자동 생성"><p>스탠드를 바닥판 위 원하는 자리에 둔 뒤 스탠드를 선택하고 누르면, 탭이 닿은 판에 위치·각도·크기(탭 폭 × 두께 + 공차)가 맞는 구멍을 만들어 줍니다. 같은 자리(1.5mm 이내)에 이미 구멍이 있으면 그 구멍을 맞춰 줍니다. 조립 상태에서만 동작합니다.</p></article>
 <article data-g="구멍" data-t="구멍 뚫기 · ＋ 추가 · − 삭제"><p>바닥판 등을 선택하고 <b>구멍 뚫기</b>를 켠 뒤 <b>＋ 추가</b>로 여러 개를 만듭니다. 목록에서 구멍을 고르고 <b>− 삭제</b>로 지웁니다. 구멍은 직사각형만 가능합니다.</p></article>
@@ -567,7 +567,14 @@ x.putImageData(im,0,0);return{c,pd}}
 const olOf=p=>p.ol!=null?Math.max(0,+p.ol||0):($('acut').checked?Math.max(0,+$('acm').value||0):0);
 const pre=(p,s,o,fl)=>{const g=grow(s,olOf(p),s.width/p.w);return prep(g.c,p,o,fl,g.pd)};
 function prep(s,p,o,fl,pp){pp=pp||0;const T=p.tab,H=holeOf(p,o),hx=(s.width-2*pp)/p.w,hy=(s.height-2*pp)/p.h;let sd=T&&T.on?T.side||'b':'b';if(fl&&sd=='l')sd='r';else if(fl&&sd=='r')sd='l';const hz=sd=='l'||sd=='r',l=T&&T.on?Math.round(T.l*(hz?hx:hy)):0;if(!l&&!H.length)return s;const dx=sd=='l'?l:0,dy=sd=='t'?l:0,c=cv(s.width+(hz?l:0),s.height+(hz?0:l)),x=c.getContext('2d');x.drawImage(s,dx,dy);
-if(l){const tw=T.w*(hz?hy:hx),d=s.getContext('2d').getImageData(0,0,s.width,s.height).data;let x0=s.width,x1=0,y0=s.height,y1=0;for(let y=0;y<s.height;y++)for(let xx=0;xx<s.width;xx++)if(d[(y*s.width+xx)*4+3]>20){if(xx<x0)x0=xx;if(xx+1>x1)x1=xx+1;if(y<y0)y0=y;y1=y+1}let fo=T.off||0;if(fl&&!hz)fo=-fo;x.fillStyle='#ffffff';if(hz)x.fillRect(sd=='l'?x0:x1-1,s.height/2-fo*hy-tw/2,l+1,tw);else x.fillRect(s.width/2+fo*hx-tw/2,sd=='t'?y0:y1-1,tw,l+1)}
+if(l){const tw=T.w*(hz?hy:hx),d=s.getContext('2d').getImageData(0,0,s.width,s.height).data;let x0=s.width,x1=0,y0=s.height,y1=0;for(let y=0;y<s.height;y++)for(let xx=0;xx<s.width;xx++)if(d[(y*s.width+xx)*4+3]>20){if(xx<x0)x0=xx;if(xx+1>x1)x1=xx+1;if(y<y0)y0=y;y1=y+1}let fo=T.off||0;if(fl&&!hz)fo=-fo;x.fillStyle='#ffffff';
+/* 탭 폭 안의 각 줄마다 '그림 가장자리 ~ 탭 끝'을 메워, 그림과 탭 사이가 뚫리지 않고 한 덩어리가 되게 함 */
+const W=s.width,Hh=s.height,op=(xx,y)=>d[(y*W+xx)*4+3]>20,lo=sd=='l'||sd=='t',a0=hz?x0:y0,a1=hz?x1-1:y1-1,E=[];
+const c0=hz?Math.max(0,Math.round(Hh/2-fo*hy-tw/2)):Math.max(0,Math.round(W/2+fo*hx-tw/2)),c1=hz?Math.min(Hh,Math.round(Hh/2-fo*hy+tw/2)):Math.min(W,Math.round(W/2+fo*hx+tw/2)),N=hz?W:Hh;
+for(let k=c0;k<c1;k++){let e=-1;if(lo){for(let q=0;q<N;q++)if(hz?op(q,k):op(k,q)){e=q;break}}else{for(let q=N-1;q>=0;q--)if(hz?op(q,k):op(k,q)){e=q;break}}E.push(e)}
+let ls=-1;for(let i=0;i<E.length;i++){if(E[i]>=0)ls=E[i];else if(ls>=0)E[i]=ls}ls=-1;for(let i=E.length-1;i>=0;i--){if(E[i]>=0)ls=E[i];else if(ls>=0)E[i]=ls}
+for(let i=0;i<E.length;i++){const k=c0+i,e=E[i]<0?(lo?a0:a1):E[i];
+if(hz){if(sd=='l')x.fillRect(x0,k,e+dx-x0+1,1);else x.fillRect(e,k,x1+l-e,1)}else{if(sd=='t')x.fillRect(k,y0,1,e+dy-y0+1);else x.fillRect(k,e,1,y1+l-e)}}}
 for(const H1 of H){x.save();x.globalCompositeOperation='destination-out';x.translate(s.width/2+(fl?-H1.x:H1.x)*hx+dx,s.height/2-H1.y*hy+dy);x.rotate((fl?H1.a:-H1.a)*Math.PI/180);x.fillRect(-H1.w*hx/2,-H1.h*hy/2,H1.w*hx,H1.h*hy);x.restore()}return c}
 function wall(M,w,h,pw,ph,ox,oy,t){const W2=w+2,B=new Uint8Array(W2*(h+2));for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(M[y*w+x]>.5)B[(y+1)*W2+x+1]=1;
 const S=(x,y)=>B[(y+1)*W2+x+1],m=(x,y)=>x<0||y<0||x>=w||y>=h?0:M[y*w+x],X=i=>(i/w-.5)*pw+ox,Y=j=>(.5-j/h)*ph+oy,k=Math.max(2,Math.round(w/400)),LM=12,P=[],N=[],z0=-t/2,z1=t/2;
